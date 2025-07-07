@@ -1,0 +1,28 @@
+{
+  "name": "youtube_clone_backend",
+  "version": "1.0.0",
+  "description": "this is my youtube clone backend created by me using Nodejs ExpressJS Mongoose",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Youtube",
+    "MERN",
+    "NodeJS",
+    "ExpressJS",
+    "MongoDB",
+    "Mongoose"
+  ],
+  "author": "Arti Maurya",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.0.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.2",
+    "nodemon": "^3.1.10"
+  }
+}
