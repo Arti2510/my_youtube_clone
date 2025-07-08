@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 export const register = async (req, res, next) => {
     
-  const { username, email, password, avatar, channels } = req.body;
+  const { username, email, password, avatar, channelId } = req.body;
 
   if (!username || username.trim() === '') {
     return res.status(400).json({ error: 'Full name is required' });
@@ -33,10 +33,25 @@ export const register = async (req, res, next) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new userModel({ username, email, password: hashedPassword, avatar, channels });
+    const user = new userModel({
+      username,
+      email,
+      password: hashedPassword,
+      avatar,
+      channelId: channelId || null // Optional
+    });
     await user.save();
 
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
+        channelId: user.channelId,
+      }
+    });
   } catch (err) {
     next(err);
   }

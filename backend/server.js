@@ -5,6 +5,9 @@ import express from 'express';
 import cors from 'cors';
 import {authRoutes} from './Routes/authRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { videoRoutes } from "./Routes/videoRoutes.js";
+import { channelRoutes } from "./Routes/channelRoutes.js";
+import { commentRoutes } from "./Routes/commentRoutes.js";
 
 dotenv.config();
 
@@ -13,7 +16,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());  // middleware for json data
 
+videoRoutes(app);
 authRoutes(app);
+channelRoutes(app);
+commentRoutes(app);
 
 app.use(errorHandler);
 

@@ -1,15 +1,42 @@
 
 import Video from "../Models/Video.model.js";
+import Channel from "../Models/Channel.model.js";
 
 // Create a new video
 export const createVideo = async (req, res) => {
   try {
+    // const newVideo = new Video({
+    //   ...req.body,
+    //   uploader: req.user.id,
+    // });
+    const { title, description, videoUrl, thumbnailUrl, channelId, views, likes, dislikes } = req.body;
+    const uploader = req.user._id; // assuming you're using auth middleware
+    const channel = await Channel.findOne({ owner: uploader });
+
+    if (!channel) {
+      return res.status(404).json({ error: "Channel not found for this user" });
+    }
+
     const newVideo = new Video({
-      ...req.body,
-      uploader: req.user.id,
+      title,
+      description,
+      videoUrl,
+      thumbnailUrl,
+      uploader,
+      channelId,
+      views,
+      likes,
+      dislikes,
     });
 
     const savedVideo = await newVideo.save();
+
+    await Channel.findByIdAndUpdate(
+      channelId,
+      { $push: { videos: savedVideo._id } },
+      { new: true }
+    );
+
     res.status(201).json(savedVideo);
   } catch (err) {
     res.status(500).json({ error: err.message });

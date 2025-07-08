@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     ]
   },
   avatar: { type: String, default: "https://t4.ftcdn.net/jpg/02/79/66/93/360_F_279669366_Lk12QalYQKMczLEa4ySjhaLtx1M2u7e6.jpg" },
-  channels: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Channel' }]
+  channelId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Channel', default: null }]
 }, { 
     timestamps: true
 });
