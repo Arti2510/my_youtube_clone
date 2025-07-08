@@ -9,7 +9,7 @@ export default function MainLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 mt-14">
+    <div className="flex bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <Sidebar isOpen={isSidebarOpen} />
 
       <div className="flex flex-col flex-1 ml-0">

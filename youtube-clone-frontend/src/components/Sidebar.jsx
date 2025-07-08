@@ -25,18 +25,20 @@ export default function Sidebar({ isOpen }) {
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-y-0' : '-translate-y-full'} md:translate-x-0 md:top-[56px] md:translate-y-0 md:inset-y-0 md:inset-x-auto md:w-64 md:pt-0
       `}>
-      <h2 className="text-xl font-bold text-red-600 mb-4">Menu</h2>
+      <h2 className="text-xl font-bold text-red-600 mb-4 mt-16">Menu</h2>
       <nav className="flex flex-col gap-4">
         {navItems.map((item) => (
           <NavLink
             key={item.name}
             to={item.path}
-            className="flex items-center gap-3 text-gray-700 hover:text-red-600"
+            className="flex items-center gap-3text-gray-700 dark:text-gray-300
+             hover:text-red-600 dark:hover:text-red-600"
           >
             {item.icon}
             <span>{item.name}</span>
           </NavLink>
         ))}
+        
       </nav>
     </aside>
   );

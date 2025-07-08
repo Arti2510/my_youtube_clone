@@ -20,7 +20,7 @@ export default function Header({ onToggleSidebar }) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-2 bg-white shadow dark:bg-gray-800">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow dark:bg-gray-800 px-4 py-2 grid grid-rows-2 gap-y-2 md:flex md:items-center md:justify-between">
       {/* Left: Logo & Menu */}
       <div className="flex items-center gap-3">
         <button onClick={onToggleSidebar} className="md:hidden">
@@ -42,7 +42,7 @@ export default function Header({ onToggleSidebar }) {
         />
         <button
           onClick={handleSearch}
-          className="px-4 py-2 bg-gray-200 rounded-r-full"
+          className="px-4 py-2 bg-gray-200 rounded-r-full border  border-gray-300 text-black light:text-white cursor-pointer"
           aria-label="Search"
         >
           <Search />
@@ -67,13 +67,13 @@ export default function Header({ onToggleSidebar }) {
                 logout();
                 navigate("/login");
               }}
-              className="bg-red-600 text-white px-4 py-1 rounded"
+              className="bg-red-600 text-white px-4 py-1 rounded cursor-pointer"
             >
               Logout
             </button>
           </>
         ) : (
-          <Link to="/login" className="bg-red-600 text-white px-4 py-1 rounded">
+          <Link to="/login" className="bg-red-600 text-white px-4 py-1 rounded cursor-pointer">
             Login
           </Link>
         )}
