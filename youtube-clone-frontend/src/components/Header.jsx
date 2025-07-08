@@ -4,6 +4,7 @@ import { Search, Menu } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Header({ onToggleSidebar }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,7 +20,7 @@ export default function Header({ onToggleSidebar }) {
   };
 
   return (
-    <header className="flex items-center justify-between px-4 py-2 shadow bg-white sticky top-0 z-50">
+    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-2 bg-white shadow dark:bg-gray-800">
       {/* Left: Logo & Menu */}
       <div className="flex items-center gap-3">
         <button onClick={onToggleSidebar} className="md:hidden">
@@ -53,6 +54,7 @@ export default function Header({ onToggleSidebar }) {
         {/* <button>
           <Upload />
         </button> */}
+        <ThemeToggle />
         {token ? (
           <>
             <img
