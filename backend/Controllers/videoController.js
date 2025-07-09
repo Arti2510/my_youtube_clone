@@ -1,61 +1,59 @@
 
-import Video from "../Models/Video.model.js";
+import User from "../Models/User.model.js";
 import Channel from "../Models/Channel.model.js";
+import Video from "../Models/Video.model.js";
 
 // Create a new video
-export const createVideo = async (req, res) => {
+export const uploadVideo = async (req, res) => {
   try {
-    // const newVideo = new Video({
-    //   ...req.body,
-    //   uploader: req.user.id,
-    // });
-    const { title, description, videoUrl, thumbnailUrl, channelId, views, likes, dislikes } = req.body;
-    const uploader = req.user._id; // assuming you're using auth middleware
-    const channel = await Channel.findOne({ owner: uploader });
-
-    if (!channel) {
-      return res.status(404).json({ error: "Channel not found for this user" });
-    }
+    const { title, videoUrl, thumbnailUrl, description, channelId } = req.body;
+    const uploader = req.user._id;
+    console.log("req.user in createVideo:", req.user);
 
     const newVideo = new Video({
       title,
-      description,
       videoUrl,
       thumbnailUrl,
-      uploader,
+      description,
       channelId,
+      uploader,
       views,
       likes,
       dislikes,
     });
 
-    const savedVideo = await newVideo.save();
-
-    await Channel.findByIdAndUpdate(
-      channelId,
-      { $push: { videos: savedVideo._id } },
-      { new: true }
-    );
-
-    res.status(201).json(savedVideo);
+    await newVideo.save();
+    res.status(201).json({ message: "Video uploaded", video: newVideo });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
 export const getAllVideos = async (req, res) => {
   try {
-    const videos = await Video.find().populate("uploader", "username").sort({ createdAt: -1 });
+    console.log("Fetching videos for user:", req.user);
+    const videos = await Video.find()
+      .populate("uploader", "username avatar")  // Optional: select fields
+      .populate("channelId", "channelName");
     res.status(200).json(videos);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Backend error in getAllVideos:", err.message);
+    res.status(500).json({ message: err.message });
   }
 };
 
 // Get video by ID
 export const getVideoById = async (req, res) => {
   try {
-    const video = await Video.findById(req.params.id).populate("uploader", "username");
+    const video = await Video.findById(req.params.id)
+      .populate("uploader", "username")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "author",
+          select: "username", // show commenter name
+        },
+      });
     if (!video) return res.status(404).json({ message: "Video not found" });
     res.status(200).json(video);
   } catch (err) {

@@ -1,5 +1,5 @@
 import Channel from "../Models/Channel.model.js";
-import userModel from "../Models/User.model.js";
+import User from "../Models/User.model.js";
 
 // ✅ Create a new channel
 export const createChannel = async (req, res) => {
@@ -8,27 +8,15 @@ export const createChannel = async (req, res) => {
     const owner = req.user._id; // from auth middleware
 
     // Check for existing channel name
-    const existingChannel = await Channel.findOne({ channelName });
-    if (existingChannel) {
-      return res.status(400).json({ message: "Channel name already exists." });
-    }
+    const existing = await Channel.findOne({ channelName });
+    if (existing) return res.status(400).json({ message: "Channel name already taken" });
 
-    const newChannel = new Channel({
-      channelName,
-      description,
-      channelBanner,
-      owner,
-      subscribers,
-    });
+    const newChannel = new Channel({ channelName, description, channelBanner, owner, subscribers });
+    await newChannel.save();
 
-    const savedChannel = await newChannel.save();
+     await User.findByIdAndUpdate(owner, { $push: { channelId: newChannel._id } });
 
-    await userModel.findByIdAndUpdate(owner, 
-      { $push: {channelId: savedChannel._id} },
-      { new: true }
-    );
-
-    res.status(201).json(savedChannel);
+    res.status(201).json({ message: "Channel created", channel: newChannel });
   } catch (error) {
     console.error("Create Channel Error:", error);
     res.status(500).json({ message: "Server error while creating channel." });

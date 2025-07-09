@@ -8,6 +8,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { videoRoutes } from "./Routes/videoRoutes.js";
 import { channelRoutes } from "./Routes/channelRoutes.js";
 import { commentRoutes } from "./Routes/commentRoutes.js";
+import { userRoutes } from "./Routes/userRoutes.js";
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ videoRoutes(app);
 authRoutes(app);
 channelRoutes(app);
 commentRoutes(app);
+userRoutes(app);
 
 app.use(errorHandler);
 

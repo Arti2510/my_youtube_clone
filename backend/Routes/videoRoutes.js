@@ -1,21 +1,19 @@
 
-import {createVideo, getAllVideos, getVideoById, updateVideo, deleteVideo } from '../Controllers/videoController.js';
+import {uploadVideo, getAllVideos, getVideoById, updateVideo, deleteVideo } from '../Controllers/videoController.js';
 import { incrementViews, likeVideo, dislikeVideo } from '../Controllers/videoController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 
 export function videoRoutes(app) {
-    // Public routes
-    app.get("/", getAllVideos);
-    app.get("/:id", getVideoById);
 
-    // Protected routes
-    app.post("/video", protect, createVideo);
-    app.put("/:id", protect, updateVideo);
-    app.delete("/:id", protect, deleteVideo);
+    app.get("/api/video", protect, getAllVideos);
+    app.get("/api/video/:id", protect, getVideoById); 
 
-    // Video interactions
-    app.put("/:id/views", incrementViews);
-    app.put("/:id/like", protect, likeVideo);
-    app.put("/:id/dislike", protect, dislikeVideo);
+    app.post("/api/video/upload", protect, uploadVideo);
+    app.put("/api/video/:id", protect, updateVideo);
+    app.delete("/api/video/:id", protect, deleteVideo);
+
+    app.put("/api/video/:id/views", protect, incrementViews);
+    app.put("/api/video/:id/like", protect, likeVideo);
+    app.put("/api/video/:id/dislike", protect, dislikeVideo);
 }

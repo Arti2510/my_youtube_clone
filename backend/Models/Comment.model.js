@@ -1,8 +1,8 @@
-
+// comment model
 
 import mongoose from "mongoose";
 
-const commentSchema = new mongoose.Schema({
+export const commentSchema = new mongoose.Schema({
     videoId: {                         // Reference to the parent video
     type: mongoose.Schema.Types.ObjectId,
     ref: 'video',

@@ -2,7 +2,7 @@ import Comment from "../Models/Comment.model.js";
 import Video from "../Models/Video.model.js";
 
 // ✅ Create a new comment
-export const createComment = async (req, res) => {
+export const postComment = async (req, res) => {
   try {
     const { videoId, text } = req.body;
     const userId = req.user._id;
@@ -14,9 +14,9 @@ export const createComment = async (req, res) => {
     }
 
     const newComment = new Comment({ videoId, userId, text });
-    const savedComment = await newComment.save();
+    await newComment.save();
 
-    res.status(201).json(savedComment);
+    res.status(201).json({ message: "Comment posted", comment: newComment });
   } catch (error) {
     console.error("Error creating comment:", error);
     res.status(500).json({ message: "Failed to post comment" });
@@ -27,22 +27,10 @@ export const createComment = async (req, res) => {
 export const getCommentsByVideo = async (req, res) => {
   try {
     const { videoId } = req.params;
-
-    const comments = await Comment.find({ videoId })
-      .populate({
-        path: "userId",
-        select: "username email"
-      })
-      .populate({
-        path: "videoId",
-        select: "title videoUrl thumbnailUrl"
-      })
-      .sort({ createdAt: -1 });
-
-    res.json(comments);
-  } catch (error) {
-    console.error("Error loading comments:", error);
-    res.status(500).json({ message: "Failed to load comments" });
+    const comments = await Comment.find({ videoId }).populate("userId");
+    res.status(200).json(comments);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 

@@ -1,11 +1,11 @@
 
-import userModel from '../Models/User.model.js';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import User from "../Models/User.model.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const register = async (req, res, next) => {
     
-  const { username, email, password, avatar, channelId } = req.body;
+  const { username, email, password, avatar } = req.body;
 
   if (!username || username.trim() === '') {
     return res.status(400).json({ error: 'Full name is required' });
@@ -27,29 +27,27 @@ export const register = async (req, res, next) => {
 
   try {
     // 🔍 Check if email already exists
-    const existingEmail = await userModel.findOne({ email });
+    const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return res.status(400).json({ error: 'Email already in use' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new userModel({
+    const newUser = new User({
       username,
       email,
       password: hashedPassword,
       avatar,
-      channelId: channelId || null // Optional
     });
-    await user.save();
+    await newUser.save();
 
     res.status(201).json({
       message: 'User registered successfully',
       user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        avatar: user.avatar,
-        channelId: user.channelId,
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+        avatar: newUser.avatar,
       }
     });
   } catch (err) {
@@ -62,7 +60,7 @@ export const login = async (req, res, next) => {
 
   try {
     // 🔍 Check if user with given email exists
-    const user = await userModel.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ error: 'Invalid email or password' });
     }

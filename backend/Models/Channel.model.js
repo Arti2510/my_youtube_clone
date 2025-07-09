@@ -1,4 +1,4 @@
-
+// channel model
 
 import mongoose from "mongoose";
 

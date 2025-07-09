@@ -1,4 +1,4 @@
-
+// user model
 
 import mongoose from "mongoose";
 
