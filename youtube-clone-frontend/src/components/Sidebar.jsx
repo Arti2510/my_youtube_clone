@@ -1,45 +1,87 @@
+import React from 'react'
+import HomeIcon from '@mui/icons-material/Home';
+import VideocamIcon from '@mui/icons-material/Videocam';
+import SubscriptionsIcon from '@mui/icons-material/Subscriptions';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import RecentActorsIcon from '@mui/icons-material/RecentActors';
+import HistoryIcon from '@mui/icons-material/History';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
+import WatchLaterIcon from '@mui/icons-material/WatchLater';
+import ContentCutIcon from '@mui/icons-material/ContentCut';
+import "../App.css";
 
-
-// src/components/Sidebar.jsx
-import {
-  Home,
-  Users,
-  Video,
-  Clock,
-  ListVideo,
-} from "lucide-react";
-import { NavLink } from "react-router-dom";
-
-const navItems = [
-  { name: "Home", icon: <Home />, path: "/" },
-  { name: "Subscriptions", icon: <Users />, path: "/subscriptions" },
-  { name: "My Videos", icon: <ListVideo />, path: "/my-videos" },
-  { name: "Watch Later", icon: <Clock />, path: "/watch-later" },
-  { name: "Upload", icon: <Video />, path: "/upload" },
-];
-
-export default function Sidebar({ isOpen }) {
+function Sidebar({SideNavbar}) {
   return (
-    <aside className={` bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 h-screen p-4 top-0 pt-16
-        md:sticky inset-x-0 left-0 z-40 w-40 shadow-md md:top-[56px] fixed
-        transform transition-transform duration-300 ease-in-out mt-16
-        ${isOpen ? 'translate-y-0' : '-translate-y-full'} md:translate-x-0 md:top-[56px] md:translate-y-0 md:inset-y-0 md:inset-x-auto md:w-64 md:pt-0
-      `}>
-      <h2 className="text-xl font-bold text-red-600 mb-4">Menu</h2>
-      <nav className="flex flex-col gap-4">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.name}
-            to={item.path}
-            className="flex items-center gap-3text-gray-700 dark:text-gray-300
-             hover:text-red-600 dark:hover:text-red-600"
-          >
-            {item.icon}
-            <span>{item.name}</span>
-          </NavLink>
-        ))}
-        
-      </nav>
-    </aside>
-  );
+    <div className={SideNavbar?'text-white flex flex-col flex-grow-[0.16] flex-shrink box-border h-[92vh] overflow-y-auto fixed top-[55px] left-0 w-[275px] p-[14px] bg-black':'hidden'}>
+      <div className='flex flex-col border-b border-b-[rgb(86,85,85)] pb-[10px]'>
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <HomeIcon sx={{color:"white"}}/>
+          <div className='text-[14px] font-normal'>Home</div>
+        </div>
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <VideocamIcon sx={{color:"white"}}/>
+          <div className='text-[14px] font-normal'>Shorts</div>
+        </div>
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <SubscriptionsIcon sx={{color:"white"}}/>
+          <div className='text-[14px] font-normal'>Subscriptions</div>
+        </div>
+      </div>
+      <div className='flex flex-col border-b border-b-[rgb(86,85,85)] py-[10px] px-0'>
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <div className='text-[14px] font-normal'>You</div>
+          <ChevronRightIcon sx={{color:"white"}}/>
+        </div>
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <RecentActorsIcon sx={{color:"white"}}/>
+          <div className='text-[14px] font-normal'>Your Channel</div>
+        </div>
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <HistoryIcon sx={{color:"white"}}/>
+          <div className='text-[14px] font-normal'>History</div>
+        </div>
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <PlaylistAddIcon sx={{color:"white"}}/>
+          <div className='text-[14px] font-normal'>Playlist</div>
+        </div>
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <SmartDisplayIcon sx={{color:"white"}}/>
+          <div className='text-[14px] font-normal'>Your Videos</div>
+        </div>
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <WatchLaterIcon sx={{color:"white"}}/>
+          <div className='text-[14px] font-normal'>Watch Later</div>
+        </div>
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <ThumbUpIcon sx={{color:"white"}}/>
+          <div className='text-[14px] font-normal'>Liked Videos</div>
+        </div>
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <ContentCutIcon sx={{color:"white"}}/>
+          <div className='text-[14px] font-normal'>Your Clips</div>
+        </div>
+      </div>
+      <div className='flex flex-col border-b border-b-[rgb(86,85,85)] py-[10px] px-0'>
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <div className='text-[14px] font-semibold'>Subscriptions</div>
+        </div> 
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <img src="https://yt3.googleusercontent.com/ytc/AIdro_m1WLxquYeEO9VgyA7-cYFrn_hd2dSaNtmL8-NIHMCQIuPQ=s160-c-k-c0x00ffffff-no-rj" alt="side_image_logo" className='w-[25px] h-[25px], rounded-full'/>
+          <div className='text-[14px] font-normal'>Aaj Tak</div>
+        </div>  
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <img src="https://yt3.googleusercontent.com/ytc/AIdro_m1WLxquYeEO9VgyA7-cYFrn_hd2dSaNtmL8-NIHMCQIuPQ=s160-c-k-c0x00ffffff-no-rj" alt="side_image_logo" className='w-[25px] h-[25px], rounded-full'/>
+          <div className='text-[14px] font-normal'>Aaj Tak</div>
+        </div>  
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+          <img src="https://yt3.googleusercontent.com/ytc/AIdro_m1WLxquYeEO9VgyA7-cYFrn_hd2dSaNtmL8-NIHMCQIuPQ=s160-c-k-c0x00ffffff-no-rj" alt="side_image_logo" className='w-[25px] h-[25px], rounded-full'/>
+          <div className='text-[14px] font-normal'>Aaj Tak</div>
+        </div>               
+      </div>
+    </div>
+  )
 }
+
+export default Sidebar;
