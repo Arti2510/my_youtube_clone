@@ -39,12 +39,12 @@ function MainPage({SideNavbar}) {
                     return (
                         <Link to={`/watch/${item._id}`} key={item._id} className='text-white no-underline flex box-border flex-col cursor-pointer h-[316px]'>
                             <div className='w-full relative box-border h-[216px]'>
-                                <img src={item.thumbnailUrl} alt="thumbnail" className='w-full h-full rounded-[10px]' />
-                                <div className='absolute bottom-0 right-0 w-auto py-[1px] px-[2px] bg-[rgb(42,42,42)] rounded-[5px]'>28:05</div>
+                                <img src={item?.thumbnailUrl || 'fallback-thumbnail.jpg'} alt="thumbnail" className='w-full h-full rounded-[10px]' />
+                                <div className='absolute bottom-0 right-0 w-auto py-[1px] px-[2px] bg-[rgb(42,42,42)] rounded-[5px]'>{item.duration || "28:05"}</div>
                             </div>
                             <div className='flex pt-[10px]'>
                                 <div className='w-[50px] h-[50px] flex justify-center items-center'>
-                                    <img src={item?.uploader?.avatar} alt="profile" className='w-4/5 rounded-full'/>
+                                    <img src={item?.uploader?.avatar || 'fallback-avatar.jpg'} alt="profile" className='w-4/5 rounded-full'/>
                                 </div>
 
                                 <div className='w-full p-[5px] box-border flex flex-col'>

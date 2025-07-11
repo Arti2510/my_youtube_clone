@@ -1,9 +1,31 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import Sidebar from '../components/Sidebar';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 function Profile({SideNavbar}) {
+    const {id} = useParams();
+    const [data, setData] = useState([]);
+    const [user, setUser] = useState(null);
+    async function fetchProfileData() {
+        axios.get(`http://localhost:5100/api/${id}/channel`)
+        .then((res)=>{
+            console.log(res.data);
+            // res.data[0]?.uploader?.channels[0]?.channelName
+            setData(res.data); 
+            setUser(res.data[0]?.uploader);  
+            console.log(res.data[0]?.uploader);
+                //res.data[0]?.uploader?.username
+        })   
+        .catch((err)=>{
+            console.log(err);
+            
+        })     
+    }
+    useEffect(()=>{
+        fetchProfileData();
+    },[])
   return (
     <div className='flex w-full pt-[10px] pr-[13px] pb-0 pl-[13px] box-border bg-black text-white'>
         <Sidebar SideNavbar={SideNavbar}/>
@@ -14,9 +36,9 @@ function Profile({SideNavbar}) {
                     <img src="https://www.rankmybizz.com/wp-content/uploads/2021/08/pngwing.png" alt="" className='w-full h-full rounded-full'/>
                 </div>
                 <div className='flex flex-col gap-[7px] py-0 px-[10px] w-[85%]'>
-                    <div className='text-4xl font-semibold'>MyChannel</div>
+                    <div className='text-4xl font-semibold'>{data[0]?.uploader?.channels[0]?.channelName}</div>
                     <div className='text-[16px] text-[rgb(153,153,153)]'>
-                        @User1 . 4 videos
+                        {user?.username} . {data.length} videos
                     </div>
                     <div className='text-[16px] text-[rgb(153,153,153)]'>
                         About section of channel

@@ -31,15 +31,29 @@ export const uploadVideo = async (req, res) => {
 export const getAllVideos = async (req, res) => {
   try {
     console.log("Fetching videos for user:", req.user);
-    const videos = await Video.find().populate('uploader', 'channelName avatar username createdAt')
-    .populate("channelId", "channelName description channelBanner subscribers video createdAt")
-    .populate({
+
+    const videos = await Video.find()
+      .populate({
+        path: 'uploader',
+        select: 'username avatar createdAt channels',
+        populate: {
+          path: 'channels',
+          select: 'channelName channelBanner subscribers createdAt',
+        },
+      })
+      .populate("channelId", "channelName description channelBanner subscribers video createdAt")
+      .populate({
         path: 'comments',
         populate: {
           path: 'user',
-          select: 'username avatar channelName',
+          select: 'username avatar channels',
+          populate: {
+            path: 'channels',
+            select: 'channelName',
+          }
         },
-      }); 
+      });
+
     res.status(200).json(videos);
   } catch (err) {
     console.error("Backend error in getAllVideos:", err.message);
@@ -47,19 +61,37 @@ export const getAllVideos = async (req, res) => {
   }
 };
 
+
 // // Get video by ID
 export const getVideoById = async (req, res) => {
   try {
-    const video = await Video.findById(req.params.id).populate('uploader', 'channelName avatar username createdAt')
-    .populate("channelId", "channelName description channelBanner subscribers video createdAt")
-    .populate({
+    const video = await Video.findById(req.params.id)
+      .populate({
+        path: 'uploader',
+        select: 'username avatar createdAt channels',
+        populate: {
+          path: 'channels',
+          select: 'channelName channelBanner subscribers createdAt'
+        }
+      })
+      .populate({
+        path: 'channelId',
+        select: 'channelName description channelBanner subscribers video createdAt'
+      })
+      .populate({
         path: 'comments',
         populate: {
           path: 'user',
-          select: 'username avatar channelName',
-        },
-      }); 
+          select: 'username avatar channels',
+          populate: {
+            path: 'channels',
+            select: 'channelName'
+          }
+        }
+      });
+
     if (!video) return res.status(404).json({ message: "Video not found" });
+
     res.status(200).json(video);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -92,26 +124,23 @@ export const updateVideo = async (req, res) => {
     }
 
     const updateFields = { ...req.body };
-
-    // Optional: safely push into arrays instead of overwriting
     const updateQuery = {
-      $set: {
-        ...updateFields
-      },
+      $set: { ...updateFields },
       $push: {}
     };
 
+    // Push to array fields if provided
     if (req.body.channelId) {
       updateQuery.$push.channelId = { $each: req.body.channelId };
       delete updateQuery.$set.channelId;
     }
 
-    if (req.body.commentId) {
-      updateQuery.$push.commentId = { $each: req.body.commentId };
-      delete updateQuery.$set.commentId;
+    if (req.body.comments) {
+      updateQuery.$push.comments = { $each: req.body.comments };
+      delete updateQuery.$set.comments;
     }
 
-    // Remove empty $push if not used
+    // Remove empty $push
     if (Object.keys(updateQuery.$push).length === 0) {
       delete updateQuery.$push;
     }
@@ -183,12 +212,30 @@ export const deleteVideo = async (req, res) => {
 // };
 
 export const getAllVideosByUserId = async (req, res) => {
-  try{
-    let {userId} = req.params;
-    const video = await Video.find({uploader:userId}).populate('uploader', 'channelName avatar username createdAt')
-    if (!video) return res.status(404).json({ message: "Video not found" });
-    res.status(200).json(video);
-  } catch(err){
-    res.status(500).json({error: err.message});
+  try {
+    const { userId } = req.params;
+
+    const videos = await Video.find({ uploader: userId })
+      .populate({
+        path: 'uploader',
+        select: 'username avatar createdAt channels',
+        populate: {
+          path: 'channels',
+          select: 'channelName channelBanner subscribers createdAt'
+        }
+      })
+      .populate({
+        path: 'channelId',
+        select: 'channelName description channelBanner subscribers video createdAt'
+      });
+
+    if (!videos || videos.length === 0) {
+      return res.status(404).json({ message: "No videos found for this user" });
+    }
+
+    res.status(200).json(videos);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-}
+};
+

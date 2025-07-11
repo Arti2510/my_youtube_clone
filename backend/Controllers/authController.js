@@ -62,7 +62,7 @@ export const login = async (req, res, next) => {
 
   try {
     // 🔍 Check if user with given email exists
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate('channels');
     if (!user) {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
@@ -86,7 +86,7 @@ export const login = async (req, res, next) => {
         username: user.username,
         email: user.email,
         avatar: user.avatar,
-        channelId:user.channelId,
+        channels: user.channels || [],
       },
     });
   } catch (err) {
