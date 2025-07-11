@@ -1,19 +1,16 @@
 
-import {uploadVideo, getAllVideos, getVideoById, updateVideo, deleteVideo } from '../Controllers/videoController.js';
-import { incrementViews, likeVideo, dislikeVideo } from '../Controllers/videoController.js';
+// import {uploadVideo, getAllVideos, getVideoById, updateVideo, deleteVideo } from '../Controllers/videoController.js';
+// import { incrementViews, likeVideo, dislikeVideo } from '../Controllers/videoController.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { uploadVideo, getAllVideos, getVideoById, getAllVideosByUserId, updateVideo, deleteVideo } from '../Controllers/videoController.js';
+import express from 'express';
+const router = express.Router();
 
+router.post('/video', protect, uploadVideo);
+router.get('/getallvideo', getAllVideos);
+router.get('/getVideoById/:id', getVideoById);
+router.get('/:userId/channel', getAllVideosByUserId);
+router.put('/video/:id', protect, updateVideo);
+router.delete('/video/:id', protect, deleteVideo);
 
-export function videoRoutes(app) {
-
-    app.get("/api/video", protect, getAllVideos);
-    app.get("/api/video/:id", protect, getVideoById); 
-
-    app.post("/api/video/upload", protect, uploadVideo);
-    app.put("/api/video/:id", protect, updateVideo);
-    app.delete("/api/video/:id", protect, deleteVideo);
-
-    app.put("/api/video/:id/views", protect, incrementViews);
-    app.put("/api/video/:id/like", protect, likeVideo);
-    app.put("/api/video/:id/dislike", protect, dislikeVideo);
-}
+export default router;

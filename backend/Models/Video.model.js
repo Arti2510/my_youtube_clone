@@ -7,7 +7,7 @@ const VideoSchema = new mongoose.Schema({
   videoUrl: { type: String, required: true },
   thumbnailUrl: { type: String, required: true },
   description: { type: String, default: '', trim: true },
-  channelId: { type: mongoose.Schema.Types.ObjectId, ref: 'channel', required: true },
+  channelId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'channel' }],
   uploader: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
   views: { type: Number, default: 0 },
   likes: { type: Number, default: 0 },

@@ -4,8 +4,9 @@ import Video from "../Models/Video.model.js";
 // ✅ Create a new comment
 export const postComment = async (req, res) => {
   try {
-    const { videoId, text } = req.body;
-    const userId = req.user._id;
+    const { videoId } = req.params;
+    const { message } = req.body;
+    const user = req.user.id;
 
     // 🔍 Validate video
     const videoExists = await Video.findById(videoId);
@@ -13,8 +14,12 @@ export const postComment = async (req, res) => {
       return res.status(404).json({ message: "Video not found" });
     }
 
-    const newComment = new Comment({ videoId, userId, text });
+    const newComment = new Comment({ video: videoId, user, message });
     await newComment.save();
+
+    await Video.findByIdAndUpdate(videoId, {
+      $push: { comments: newComment._id }
+    });
 
     res.status(201).json({ message: "Comment posted", comment: newComment });
   } catch (error) {
@@ -25,10 +30,13 @@ export const postComment = async (req, res) => {
 
 // ✅ Get all comments for a video (with video & user populated)
 export const getCommentsByVideo = async (req, res) => {
-  try {
+  try {    
+
     const { videoId } = req.params;
-    const comments = await Comment.find({ videoId }).populate("userId");
+    const comments = await Comment.find({ video : videoId }).populate('user', 'channelName avatar username createdAt')
+    .sort({ createdAt: -1 });
     res.status(200).json(comments);
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -43,11 +51,14 @@ export const updateComment = async (req, res) => {
       return res.status(404).json({ message: "Comment not found" });
     }
 
-    if (comment.userId.toString() !== req.user._id.toString()) {
+    console.log("comment.user:", comment.user);
+    console.log("req.user:", req.user);
+
+    if (comment.user.toString() !== req.user.id) {
       return res.status(403).json({ message: "Unauthorized to update this comment" });
     }
 
-    comment.text = req.body.text || comment.text;
+    comment.message = req.body.message || comment.message;
     await comment.save();
 
     res.json(comment);
@@ -66,7 +77,7 @@ export const deleteComment = async (req, res) => {
       return res.status(404).json({ message: "Comment not found" });
     }
 
-    if (comment.userId.toString() !== req.user._id.toString()) {
+    if (!req.user || comment.user.toString() !== req.user.id) {
       return res.status(403).json({ message: "Unauthorized to delete this comment" });
     }
 

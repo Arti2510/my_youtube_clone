@@ -4,17 +4,15 @@ import User from "../Models/User.model.js";
 // ✅ Create a new channel
 export const createChannel = async (req, res) => {
   try {
-    const { channelName, description, channelBanner, subscribers } = req.body;
-    const owner = req.user._id; // from auth middleware
+    const { channelName, description, channelBanner, subscribers, video } = req.body;
+    const user = req.user.id; // from auth middleware
 
     // Check for existing channel name
     const existing = await Channel.findOne({ channelName });
     if (existing) return res.status(400).json({ message: "Channel name already taken" });
 
-    const newChannel = new Channel({ channelName, description, channelBanner, owner, subscribers });
+    const newChannel = new Channel({ channelName, description, channelBanner, user, subscribers, video });
     await newChannel.save();
-
-     await User.findByIdAndUpdate(owner, { $push: { channelId: newChannel._id } });
 
     res.status(201).json({ message: "Channel created", channel: newChannel });
   } catch (error) {
@@ -27,9 +25,9 @@ export const createChannel = async (req, res) => {
 export const getAllChannels = async (req, res) => {
   try {
     const channels = await Channel.find()
-      .populate("owner", "username email")
+      .populate("user", "username email")
       .populate({
-        path: "videos",
+        path: "video",
         select: "title thumbnailUrl videoUrl createdAt"
       });
 
@@ -44,9 +42,9 @@ export const getAllChannels = async (req, res) => {
 export const getChannelById = async (req, res) => {
   try {
     const channel = await Channel.findById(req.params.id)
-      .populate("owner", "username email")
+      .populate("user", "username email")
       .populate({
-        path: "videos",
+        path: "video",
         select: "title thumbnailUrl videoUrl createdAt"
       });
 
@@ -70,7 +68,7 @@ export const updateChannel = async (req, res) => {
       return res.status(404).json({ message: "Channel not found" });
     }
 
-    if (channel.owner.toString() !== req.user._id.toString()) {
+    if (channel.user.toString() !== req.user.id) {
       return res.status(403).json({ message: "Unauthorized to update this channel" });
     }
 
@@ -82,6 +80,7 @@ export const updateChannel = async (req, res) => {
 
     await channel.save();
     res.json(channel);
+    
   } catch (error) {
     console.error("Error updating channel:", error);
     res.status(500).json({ message: "Error updating channel" });
@@ -97,7 +96,7 @@ export const deleteChannel = async (req, res) => {
       return res.status(404).json({ message: "Channel not found" });
     }
 
-    if (channel.owner.toString() !== req.user._id.toString()) {
+    if (channel.user.toString() !== req.user.id) {
       return res.status(403).json({ message: "Unauthorized to delete this channel" });
     }
 

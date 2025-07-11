@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
-import authRoutes from './Routes/authRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
-import { videoRoutes } from "./Routes/videoRoutes.js";
-import { channelRoutes } from "./Routes/channelRoutes.js";
-import { commentRoutes } from "./Routes/commentRoutes.js";
-import { userRoutes } from "./Routes/userRoutes.js";
+import authRoutes from './Routes/authRoutes.js';
+import videoRoutes from "./Routes/videoRoutes.js";
+import channelRoutes from "./Routes/channelRoutes.js";
+import commentRoutes from "./Routes/commentRoutes.js";
+// import { userRoutes } from "./Routes/userRoutes.js";
 
 dotenv.config();
 
@@ -17,11 +17,9 @@ app.use(cors());
 app.use(express.json());  // middleware for json data
 
 app.use('/auth', authRoutes);
-
-videoRoutes(app);
-channelRoutes(app);
-commentRoutes(app);
-userRoutes(app);
+app.use('/api', videoRoutes);
+app.use('/api/videocomment', commentRoutes);
+app.use('/api/userchannel', channelRoutes);
 
 app.use(errorHandler);
 

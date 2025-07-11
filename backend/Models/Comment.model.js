@@ -3,12 +3,12 @@
 import mongoose from "mongoose";
 
 export const commentSchema = new mongoose.Schema({
-    videoId: {                         // Reference to the parent video
+  video: {                         // Reference to the parent video
     type: mongoose.Schema.Types.ObjectId,
     ref: 'video',
     required: true
   },
-  userId: {                         // The user who posted the comment
+  user: {                         // The user who posted the comment
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
     required: true

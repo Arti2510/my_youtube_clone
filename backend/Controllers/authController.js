@@ -1,5 +1,5 @@
 
-import user from "../Models/User.model.js";
+import User from "../Models/User.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -27,13 +27,13 @@ export const register = async (req, res, next) => {
 
   try {
     // 🔍 Check if email already exists
-    const existingEmail = await user.findOne({ email });
+    const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return res.status(400).json({ error: 'Email already in use' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new user({
+    const newUser = new User({
       username,
       email,
       password: hashedPassword,
@@ -86,10 +86,10 @@ export const login = async (req, res, next) => {
         username: user.username,
         email: user.email,
         avatar: user.avatar,
+        channelId:user.channelId,
       },
     });
   } catch (err) {
     next(err);
   }
 };
-

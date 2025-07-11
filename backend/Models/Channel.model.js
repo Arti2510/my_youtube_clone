@@ -9,9 +9,9 @@ const channelSchema = new mongoose.Schema({
     trim: true,
     unique: true
   },
-  owner: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'user',
     required: true
   },
   description: {
@@ -27,9 +27,9 @@ const channelSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  videos: [{
+  video: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Video'
+    ref: 'video'
   }]
 }, {
   timestamps: true
