@@ -13,15 +13,11 @@ export const commentSchema = new mongoose.Schema({
     ref: 'user',
     required: true
   },
-  text: {                           // The comment text
+  message: {                           // The comment text
     type: String,
     required: true,
     trim: true
   },
-  timestamp: {                      // When the comment was posted
-    type: Date,
-    default: Date.now
-  }
 }, {
   timestamps: true  
 });

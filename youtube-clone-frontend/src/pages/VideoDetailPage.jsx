@@ -1,10 +1,16 @@
 
-import React from 'react'
+import React, {useState} from 'react'
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import { Link } from 'react-router-dom';
 
 function VideoDetailPage() {
+  const [comment, setComment] = useState("");
+  function handleOnChangeInp(event, name) {
+    setComment({
+      ...comment,[name]:event.target.value
+    })
+  }
   return (
     <div className='mt-[56px] flex py-[30px] px-0 justify-center bg-black text-white'>
       <div className='w-full max-w-[875px] flex flex-col'>
@@ -51,7 +57,7 @@ function VideoDetailPage() {
           <div className='flex mt-2.5 gap-2.5'>
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ2shxjBolAQ3pYz1AJIAv0vd3-7AdOLSQHA&s" alt="" className='w-9 h-9 rounded-full' />
             <div className='flex flex-col w-full'>
-              <input type="text" placeholder='Add a Comment' className='w-full bg-black text-white h-9 border-0 text-base border-b border-gray-500 focus:outline-none placeholder:text-[16px]' />
+              <input type="text" value={comment} onChange={(e)=>{setComment(e.target.value)}} placeholder='Add a Comment' className='w-full bg-black text-white h-9 border-0 text-base border-b border-gray-500 focus:outline-none placeholder:text-[16px]' />
               <div className='flex justify-end gap-4 mt-2.5'>
                 <div className='py-[8px] px-[16px] rounded-[18px] border cursor-pointer hover:bg-white hover:text-black'>Cancel</div>
                 <div className='py-[8px] px-[16px] rounded-[18px] border cursor-pointer hover:bg-white hover:text-black'>Comment</div>

@@ -7,17 +7,17 @@ const VideoSchema = new mongoose.Schema({
   videoUrl: { type: String, required: true },
   thumbnailUrl: { type: String, required: true },
   description: { type: String, default: '', trim: true },
-  channelId: { type: mongoose.Schema.Types.ObjectId, ref: 'Channel', required: true },
-  uploader: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  channelId: { type: mongoose.Schema.Types.ObjectId, ref: 'channel', required: true },
+  uploader: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
   views: { type: Number, default: 0 },
   likes: { type: Number, default: 0 },
   dislikes: { type: Number, default: 0 },
-  uploadDate: { type: Date, default: Date.now },
-  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }]
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "comment" }],
+  videoType: {type: String, default: "All"}
 }, {
   timestamps: true
 });
 
-const Video = mongoose.model('video', VideoSchema);
+const video = mongoose.model('video', VideoSchema);
 
-export default Video;
+export default video;

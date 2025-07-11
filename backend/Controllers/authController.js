@@ -1,11 +1,11 @@
 
-import User from "../Models/User.model.js";
+import user from "../Models/User.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const register = async (req, res, next) => {
     
-  const { username, email, password, avatar } = req.body;
+  const { username, email, password, avatar, channelId } = req.body;
 
   if (!username || username.trim() === '') {
     return res.status(400).json({ error: 'Full name is required' });
@@ -27,17 +27,18 @@ export const register = async (req, res, next) => {
 
   try {
     // 🔍 Check if email already exists
-    const existingEmail = await User.findOne({ email });
+    const existingEmail = await user.findOne({ email });
     if (existingEmail) {
       return res.status(400).json({ error: 'Email already in use' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({
+    const newUser = new user({
       username,
       email,
       password: hashedPassword,
       avatar,
+      channelId,
     });
     await newUser.save();
 
@@ -48,6 +49,7 @@ export const register = async (req, res, next) => {
         username: newUser.username,
         email: newUser.email,
         avatar: newUser.avatar,
+        channelId: newUser.channelId,
       }
     });
   } catch (err) {

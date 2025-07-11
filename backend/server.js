@@ -1,9 +1,8 @@
-
 import mongoose from "mongoose";
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
-import {authRoutes} from './Routes/authRoutes.js';
+import authRoutes from './Routes/authRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { videoRoutes } from "./Routes/videoRoutes.js";
 import { channelRoutes } from "./Routes/channelRoutes.js";
@@ -17,8 +16,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());  // middleware for json data
 
+app.use('/auth', authRoutes);
+
 videoRoutes(app);
-authRoutes(app);
 channelRoutes(app);
 commentRoutes(app);
 userRoutes(app);
@@ -33,9 +33,3 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
     });
   })
   .catch(err => console.error("MongoDB connection error:", err));
-
-
-
-
-
-

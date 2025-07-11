@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Route, Routes } from 'react-router-dom';
 import VideoDetailPage from "./pages/VideoDetailPage";
 import Profile from "./pages/Profile";
+import VideoUpload from "./pages/VideoUpload";
+import RegisterPage from "./pages/RegisterPage";
 
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
         <Route path="/" element={<HomePage SideNavbar={SideNavbar}/>}></Route>
         <Route path="/watch/:id" element={<VideoDetailPage />}></Route>
         <Route path="/user/:id" element={<Profile SideNavbar={SideNavbar}/>}></Route>
+        <Route path="/:id/upload" element={<VideoUpload />}></Route>
+        <Route path="/signup" element={<RegisterPage />}></Route>
       </Routes>
     </div>
   );

@@ -5,11 +5,13 @@ import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import VideoCallIcon from '@mui/icons-material/VideoCall';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import { Link, useNavigate } from 'react-router-dom';
+import Login from './Login';
 
 function Header ({sidenavbar, SideNavbar}) {
 
   const [userPic, setUserPic] = useState("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ2shxjBolAQ3pYz1AJIAv0vd3-7AdOLSQHA&s");
   const [navbarModel, setNavbarModel] = useState(false);
+  const [login, setLogin] = useState(false);
   const navigate = useNavigate();
 
   function handleClickModel() {
@@ -23,6 +25,20 @@ function Header ({sidenavbar, SideNavbar}) {
   function handleProfile() {
     navigate('/user/9897');
     setNavbarModel(false);
+  }
+
+  function setLOginModel() {
+    setLogin(false);
+  }
+
+  function onClickOption(button) {
+    setNavbarModel(false);
+    if(button === "login") {
+      setLogin(true)
+    }
+    else {
+
+    }
   }
 
   return(
@@ -49,17 +65,22 @@ function Header ({sidenavbar, SideNavbar}) {
         </div>
       </div>
       <div className='flex gap-[10px] justify-center items-center relative'>
-        <VideoCallIcon sx={{color:"white", cursor:"pointer", fontSize:"30px"}}/>
+        <Link to={'/9897/upload'}>
+          <VideoCallIcon sx={{color:"white", cursor:"pointer", fontSize:"30px"}}/>
+        </Link>
         <NotificationsNoneIcon sx={{color:"white", cursor:"pointer", fontSize:"30px"}}/>
         <img src={userPic} alt="user_logo" className='w-[30px] rounded-full cursor-pointer' onClick={handleClickModel}/>
         { navbarModel && 
           <div className='absolute top-[35px] w-full z-[20] text-white'>
             <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]' onClick={handleProfile}>Profile</div>
-            <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]'>LogIn</div>
-            <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]'>Logout</div>
+            <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]' onClick={() => onClickOption("login")}>LogIn</div>
+            <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]' onClick={() => onClickOption("logout")}>Logout</div>
           </div>
         }
       </div>
+        {
+          login && <Login setLOginModel={setLOginModel}/>
+        }
     </div>
   )
 }

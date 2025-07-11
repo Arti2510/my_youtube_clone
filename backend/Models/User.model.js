@@ -25,11 +25,11 @@ const userSchema = new mongoose.Schema({
     ]
   },
   avatar: { type: String, default: "https://t4.ftcdn.net/jpg/02/79/66/93/360_F_279669366_Lk12QalYQKMczLEa4ySjhaLtx1M2u7e6.jpg" },
-  channelId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Channel', default: null }]
+  channelId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'channel'}]
 }, { 
     timestamps: true
 });
 
-const userModel = mongoose.model('user', userSchema);
+const user = mongoose.model('user', userSchema);
 
-export default userModel;
+export default user;
