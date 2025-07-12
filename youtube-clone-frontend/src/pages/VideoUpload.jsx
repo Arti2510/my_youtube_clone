@@ -6,7 +6,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 
 function VideoUpload() {
-    const [inputField, setinputField] = useState({"title":"", "description":"", "videoType":"", "videoUrl":"", "thumbnailUrl":""});
+    const [inputField, setinputField] = useState({"title":"", "description":"", "category":"", "videoLink":"", "thumbnail":""});
     const [loader, setLoader] = useState(false);
     function handleOnChangeInp(event, name) {
     setinputField({
@@ -24,7 +24,7 @@ async function uploadedImage(e, type) {
       // cloudName = "df3tu2rjt"
       const response = await axios.post(`https://api.cloudinary.com/v1_1/df3tu2rjt/${type}/upload`, data);
       const url = response.data.url;
-      let val = type==="image"?"thumbnailUrl":"videoUrl";
+      let val = type==="image"?"thumbnail":"videoLink";
         setinputField({
         ...inputField,[val]:url
       })  
@@ -49,7 +49,7 @@ async function uploadedImage(e, type) {
             <div className='flex flex-col gap-[30px] mt-[30px] items-center'>
                 <input type="text" value={inputField.title} onChange={(e)=>handleOnChangeInp(e,"title")} placeholder='Title of Video' className='w-[70%] h-[45px] px-[20px] py-0 text-white box-border bg-[#222222] border-0 rounded-[5px]' />
                 <input type="text" value={inputField.description} onChange={(e)=>handleOnChangeInp(e,"description")} placeholder='Description' className='w-[70%] h-[45px] px-[20px] py-0 text-white box-border bg-[#222222] border-0 rounded-[5px]' />
-                <input type="text" value={inputField.videoType} onChange={(e)=>handleOnChangeInp(e, "videoType")} placeholder='Category' className='w-[70%] h-[45px] px-[20px] py-0 text-white box-border bg-[#222222] border-0 rounded-[5px]' />
+                <input type="text" value={inputField.category} onChange={(e)=>handleOnChangeInp(e, "category")} placeholder='Category' className='w-[70%] h-[45px] px-[20px] py-0 text-white box-border bg-[#222222] border-0 rounded-[5px]' />
                 <div class="flex items-center gap-2">
                     <label className="text-white">Thumbnail</label>
                     <input 
