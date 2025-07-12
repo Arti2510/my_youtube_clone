@@ -42,8 +42,9 @@ function Header ({sidenavbar, SideNavbar}) {
     else {
       localStorage.clear();
       setUserName("");                // Clear React state
-      setUserPic("");                 
-      setIsLogedIn(false);            // Mark user as logged out
+      setUserPic("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ2shxjBolAQ3pYz1AJIAv0vd3-7AdOLSQHA&s"); 
+      window.dispatchEvent(new Event("authChanged"));                
+      setIsLogedIn(false);           // Mark user as logged out
 
       getLogoutFunction();            // Make API call to backend logout
 

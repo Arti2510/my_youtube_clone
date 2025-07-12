@@ -1,36 +1,50 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Profile({ SideNavbar }) {
   const { id } = useParams();
   const [data, setData] = useState([]);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
   async function fetchProfileData() {
     const token = localStorage.getItem("token");
-    axios
-      .get(`http://localhost:5100/api/${id}/channel`,{
+    if (!token) {
+      navigate("/");
+      return;
+    }
+    try {
+      const res = await axios.get(`http://localhost:5100/api/${id}/channel`, {
         headers: {
-          Authorization: `Bearer ${token}` // Add token to request header
+          Authorization: `Bearer ${token}`,
         },
-      })
-      .then((res) => {
-        console.log(res.data);
-        // res.data[0]?.uploader?.channels[0]?.channelName
-        setData(res.data);
-        setUser(res.data[0]?.uploader);
-        console.log(res.data[0]?.uploader);
-        //res.data[0]?.uploader?.username
-      })
-      .catch((err) => {
-        console.log(err);
       });
-  }
+      setData(res.data);
+      setUser(res.data[0]?.uploader);
+    } catch (err) {
+      console.error(err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/");
+      }
+    }
+  };
   useEffect(() => {
     fetchProfileData();
-  }, []);
+
+    const handleAuthChange = () => {
+      const token = localStorage.getItem("token");
+      if (!token) navigate("/");
+    };
+
+    window.addEventListener("authChanged", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("authChanged", handleAuthChange);
+    };
+  }, [id, navigate]);
   return (
     <div className="flex w-full pt-[10px] pr-[13px] pb-0 pl-[13px] box-border bg-black text-white">
       <Sidebar SideNavbar={SideNavbar} />

@@ -4,7 +4,7 @@ import Video from "../Models/Video.model.js";
 // Create a new video
 export const uploadVideo = async (req, res) => {
   try {
-    const { title, videoUrl, thumbnailUrl, description, channelId, views, likes, dislikes, videoType, comments, about } = req.body;
+    const { title, videoUrl, thumbnailUrl, description, channelId, views, likes, dislikes, videoType, comments } = req.body;
     console.log("👤 req.user:", req.user);
     const uploader = req.user._id;
 
@@ -13,14 +13,13 @@ export const uploadVideo = async (req, res) => {
       videoUrl,
       thumbnailUrl,
       description,
-      channelId,
       uploader,
-      views,
-      likes,
-      dislikes,
-      videoType,
-      comments,
-      about,
+      videoType: videoType || "All",
+      channelId: channelId ? [channelId] : [],
+      views: views || 0,
+      likes: likes || 0,
+      dislikes: dislikes || 0,
+      comments: comments || [],
     });
 
     await newVideo.save();
