@@ -27,7 +27,6 @@ function Login({setLOginModel}) {
       localStorage.setItem("Email", res.data.user.email);
       localStorage.setItem("channels", res.data.user.channels);
       localStorage.setItem("avatar", res.data.user.avatar);
-      window.dispatchEvent(new Event("authChanged"));
       window.location.reload();
     }) 
     .catch((err)=>{

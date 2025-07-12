@@ -10,17 +10,15 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
-import { Link } from 'react-router-dom';
 import "../App.css";
 
 function Sidebar({SideNavbar}) {
-  const userId = localStorage.getItem("UserId");
   return (
     <div className={SideNavbar?'text-white flex flex-col flex-grow-[0.16] flex-shrink box-border h-[92vh] overflow-y-auto fixed top-[55px] left-0 w-[275px] p-[14px] bg-black':'hidden'}>
       <div className='flex flex-col border-b border-b-[rgb(86,85,85)] pb-[10px]'>
         <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
           <HomeIcon sx={{color:"white"}}/>
-          <Link to="/" className='text-[14px] font-normal'>Home</Link>
+          <div className='text-[14px] font-normal'>Home</div>
         </div>
         <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
           <VideocamIcon sx={{color:"white"}}/>
@@ -36,10 +34,10 @@ function Sidebar({SideNavbar}) {
           <div className='text-[14px] font-normal'>You</div>
           <ChevronRightIcon sx={{color:"white"}}/>
         </div>
-        <Link to={`/user/${userId}`} className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
+        <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
           <RecentActorsIcon sx={{color:"white"}}/>
           <div className='text-[14px] font-normal'>Your Channel</div>
-        </Link>
+        </div>
         <div className='flex gap-[20px] items-center py-[9px] px-[10px] rounded-[15px] cursor-pointer hover:bg-[rgb(35,35,35)]'>
           <HistoryIcon sx={{color:"white"}}/>
           <div className='text-[14px] font-normal'>History</div>
