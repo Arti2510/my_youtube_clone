@@ -13,7 +13,7 @@ function RegisterPage() {
   const navigate = useNavigate();
   const [loader, setLoader] = useState(false);
   const [uploadedImgaeUrl, setuploadedImgaeUrl] = useState("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ2shxjBolAQ3pYz1AJIAv0vd3-7AdOLSQHA&s")
-  const [signUpField, setSignUpField] = useState({"username":"", "email":"", "password":"", "about":"", "profilePic":uploadedImgaeUrl});
+  const [signUpField, setSignUpField] = useState({"username":"", "email":"", "password":"", "about":"", "avatar":uploadedImgaeUrl});
   function handleInpField(event, name) {
     setSignUpField({
       ...signUpField,[name]:event.target.value
@@ -36,7 +36,7 @@ function RegisterPage() {
       const imageUrl = response.data.url;
       setuploadedImgaeUrl(imageUrl);
       setSignUpField({
-      ...signUpField,"profilePic":imageUrl
+      ...signUpField,"avatar":imageUrl
     })
     } catch(err){
       setLoader(false)
@@ -62,9 +62,7 @@ function RegisterPage() {
       setLoader(false)
     })
   }
-  useEffect(()=>{
-    handleSignUp()
-  },[]);
+  
   return (
     <div className='mt-14 text-white w-full flex flex-col items-center h-screen bg-black'>
       <div className='w-[40%] border py-[15px] px-[25px] mt-[30px] flex flex-col items-center justify-center shadow-[0.5px_0.5px_8px_white]'>
