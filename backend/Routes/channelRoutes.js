@@ -6,7 +6,7 @@ const router = express.Router();
 import { createChannel, getAllChannels, getChannelById, updateChannel, deleteChannel } from "../Controllers/channelController.js";
 
 
-router.post("/:userId/channel", protect, createChannel);
+router.post("/channel", protect, createChannel);
 router.get("/channels", getAllChannels); 
 router.get("/channel/:id", getChannelById); 
 router.put("/channel/:id", protect, updateChannel); 

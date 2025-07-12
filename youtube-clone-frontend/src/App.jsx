@@ -8,7 +8,6 @@ import VideoDetailPage from "./pages/VideoDetailPage";
 import Profile from "./pages/Profile";
 import VideoUpload from "./pages/VideoUpload";
 import RegisterPage from "./pages/RegisterPage";
-import CreateChannel from "./pages/CreateChannel";
 
 
 function App() {
@@ -36,7 +35,6 @@ function App() {
         <Route path="/user/:id" element={<Profile SideNavbar={SideNavbar}/>}></Route>
         <Route path="/:id/upload" element={<VideoUpload />}></Route>
         <Route path="/signup" element={<RegisterPage />}></Route>
-        <Route path="/:userId/channel" element={<CreateChannel/>}></Route>
       </Routes>
     </div>
   );

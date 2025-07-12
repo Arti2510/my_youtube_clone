@@ -105,20 +105,6 @@ function Header ({sidenavbar, SideNavbar}) {
         </div>
       </div>
       <div className='flex gap-[10px] justify-center items-center relative'>
-        {/* ➕ Create Channel button */}
-          <button
-            onClick={() => {
-                const userId = localStorage.getItem("UserId");
-                if (userId) {
-                  navigate(`/${userId}/channel`);
-                } else {
-                  toast.error("Please login to create a channel");
-                }
-              }}
-            className='text-white border border-white px-3 py-1 rounded hover:bg-white hover:text-black text-sm font-medium rounded-[20px] cursor-pointer'
-          >
-            + Create Channel
-          </button>
         <Link to={'/9897/upload'}>
           <VideoCallIcon sx={{color:"white", cursor:"pointer", fontSize:"30px"}}/>
         </Link>

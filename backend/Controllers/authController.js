@@ -42,7 +42,7 @@ export const register = async (req, res, next) => {
       about,
     });
     await newUser.save();
-    console.log("Avatar received from frontend:", avatar);
+
     res.status(201).json({
       message: 'User registered successfully',
       user: {

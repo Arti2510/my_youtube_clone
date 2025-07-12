@@ -13,58 +13,28 @@ function VideoUpload() {
       ...inputField,[name]:event.target.value
     })
   }
-// async function uploadedImage(e, type) {
-//     setLoader(true);
-//     const files = e.target.files;   
-//     const data = new FormData();
-//     data.append('file', files[0]);
-//     //youtube-clone
-//     data.append('upload_preset', 'youtube-clone');
-//     try {
-//       // cloudName = "df3tu2rjt"
-//       const response = await axios.post(`https://api.cloudinary.com/v1_1/df3tu2rjt/${type}/upload`, data);
-//       const url = response.data.url;
-//       let val = type==="image"?"thumbnailUrl":"videoUrl";
-//         setinputField({
-//         ...inputField,[val]:url
-//       })  
-//       setLoader(false);       
-//     } catch(err){
-//         setLoader(false)
-//       console.log(err);
+async function uploadedImage(e, type) {
+    setLoader(true);
+    const files = e.target.files;   
+    const data = new FormData();
+    data.append('file', files[0]);
+    //youtube-clone
+    data.append('upload_preset', 'youtube-clone');
+    try {
+      // cloudName = "df3tu2rjt"
+      const response = await axios.post(`https://api.cloudinary.com/v1_1/df3tu2rjt/${type}/upload`, data);
+      const url = response.data.url;
+      let val = type==="image"?"thumbnailUrl":"videoUrl";
+        setinputField({
+        ...inputField,[val]:url
+      })  
+      setLoader(false);       
+    } catch(err){
+        setLoader(false)
+      console.log(err);
       
-//     }
-//   }
-
-  const handleSubmit = async () => {
-  if (!inputField.title || !inputField.description || !inputField.videoUrl || !inputField.thumbnailUrl) {
-    alert("Please fill all fields and wait for uploads to complete.");
-    return;
+    }
   }
-
-  try {
-    const token = localStorage.getItem('token'); // assuming token is stored here
-    const response = await axios.post('http://localhost:5100/api/video', inputField, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    alert("✅ Video uploaded successfully!");
-    // Optional: Reset fields after successful upload
-    setinputField({
-      title: "",
-      description: "",
-      videoType: "",
-      videoUrl: "",
-      thumbnailUrl: ""
-    });
-  } catch (error) {
-    console.error("❌ Upload failed:", error);
-    alert("Failed to upload video. Please try again.");
-  }
-};
 
   console.log(inputField);
   
@@ -103,7 +73,7 @@ function VideoUpload() {
                 }
             </div>
             <div className='flex gap-[30px] justify-center mt-[30px]'>
-                <div onClick={handleSubmit} className='py-[10px] px-[20px] border font-medium text-[18px] rounded-[5px] cursor-pointer text-white no-underline hover:bg-white hover:text-black'>Upload</div>
+                <div className='py-[10px] px-[20px] border font-medium text-[18px] rounded-[5px] cursor-pointer text-white no-underline hover:bg-white hover:text-black'>Upload</div>
                 <Link to={'/'} className='py-[10px] px-[20px] border font-medium text-[18px] rounded-[5px] cursor-pointer text-white no-underline hover:bg-white hover:text-black'>Home</Link>
             </div>
         </div>
