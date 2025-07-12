@@ -1,4 +1,4 @@
-import React, {useState } from 'react';
+import React, {useState, useEffect } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
@@ -10,8 +10,10 @@ import Login from './Login';
 function Header ({sidenavbar, SideNavbar}) {
 
   const [userPic, setUserPic] = useState("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ2shxjBolAQ3pYz1AJIAv0vd3-7AdOLSQHA&s");
+  const [userName, setUserName] = useState("");
   const [navbarModel, setNavbarModel] = useState(false);
   const [login, setLogin] = useState(false);
+  const [isLogedIn, setIsLogedIn] = useState(false);
   const navigate = useNavigate();
 
   function handleClickModel() {
@@ -23,7 +25,8 @@ function Header ({sidenavbar, SideNavbar}) {
   }
 
   function handleProfile() {
-    navigate('/user/9897');
+    let userId = localStorage.getItem("UserId");
+    navigate(`/user/${userId}`);
     setNavbarModel(false);
   }
 
@@ -37,10 +40,46 @@ function Header ({sidenavbar, SideNavbar}) {
       setLogin(true)
     }
     else {
+      localStorage.clear();
+      setUserName("");                // Clear React state
+      setUserPic("");                 
+      setIsLogedIn(false);            // Mark user as logged out
 
+      getLogoutFunction();            // Make API call to backend logout
+
+      navigate('/');
     }
   }
 
+  function getLogoutFunction(){
+    axios.post('http://localhost:5100/api/auth/logout', {}, {withCredentials: true})
+    .then((res)=>{
+      console.log(res);
+      
+    })
+    .catch((err)=>{
+      console.log(err);
+      
+    })
+  }
+
+  
+
+  useEffect(()=>{
+    let userName = localStorage.getItem("UserName");
+    console.log("username: ", userName);
+    
+    let userProfilePic = localStorage.getItem("avatar");  
+    let val = localStorage.getItem("UserId");
+    val !== null ? true : false;
+    setIsLogedIn(val);
+    if(userProfilePic!==null){
+      setUserPic(userProfilePic);
+    }
+    if(userName!==null){
+      setUserName(userName);
+    }
+  },[]);
   return(
     <div className='h-14 box-border py-[10px] px-[16px] flex items-center w-full justify-between top-0 fixed bg-black z-10'>
       <div className="gap-[10px] flex justify-center items-center w-fit">
@@ -70,11 +109,12 @@ function Header ({sidenavbar, SideNavbar}) {
         </Link>
         <NotificationsNoneIcon sx={{color:"white", cursor:"pointer", fontSize:"30px"}}/>
         <img src={userPic} alt="user_logo" className='w-[30px] rounded-full cursor-pointer' onClick={handleClickModel}/>
+        <div className='bg-black text-white'>{userName}</div>
         { navbarModel && 
           <div className='absolute top-[35px] w-full z-[20] text-white'>
-            <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]' onClick={handleProfile}>Profile</div>
-            <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]' onClick={() => onClickOption("login")}>LogIn</div>
-            <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]' onClick={() => onClickOption("logout")}>Logout</div>
+            {isLogedIn && <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]' onClick={handleProfile}>Profile</div>}
+            {!isLogedIn && <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]' onClick={() => onClickOption("login")}>LogIn</div>}
+            {isLogedIn && <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]' onClick={() => onClickOption("logout")}>Logout</div>}
           </div>
         }
       </div>

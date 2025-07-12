@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 
 export const register = async (req, res, next) => {
     
-  const { username, email, password, avatar, channelId } = req.body;
+  const { username, email, password, avatar, channelId, about } = req.body;
 
   if (!username || username.trim() === '') {
     return res.status(400).json({ error: 'Full name is required' });
@@ -39,6 +39,7 @@ export const register = async (req, res, next) => {
       password: hashedPassword,
       avatar,
       channelId,
+      about,
     });
     await newUser.save();
 
@@ -78,6 +79,13 @@ export const login = async (req, res, next) => {
       expiresIn: '1d',
     });
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax", // Or "None" if frontend & backend are on different domains and using HTTPS
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
     res.json({
       message: 'Login successful',
       token,
@@ -91,5 +99,32 @@ export const login = async (req, res, next) => {
     });
   } catch (err) {
     next(err);
+  }
+};
+
+export async function logout(req, res) {
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+    });
+
+    res.status(200).json({ message: 'Logged out successfully' });
+  } catch (err) {
+    console.error('Logout error:', err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+
+export const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password -__v")
+    .populate("channels", "channelName description channelBanner subscribers video");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

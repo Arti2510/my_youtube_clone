@@ -7,9 +7,9 @@ import express from 'express';
 const router = express.Router();
 
 router.post('/video', protect, uploadVideo);
-router.get('/getallvideo', getAllVideos);
-router.get('/getVideoById/:id', getVideoById);
-router.get('/:userId/channel', getAllVideosByUserId);
+router.get('/getallvideo', protect, getAllVideos);
+router.get('/getVideoById/:id', protect, getVideoById);
+router.get('/:userId/channel', protect, getAllVideosByUserId);
 router.put('/video/:id', protect, updateVideo);
 router.delete('/video/:id', protect, deleteVideo);
 

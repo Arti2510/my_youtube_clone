@@ -4,8 +4,9 @@ import Video from "../Models/Video.model.js";
 // Create a new video
 export const uploadVideo = async (req, res) => {
   try {
-    const { title, videoUrl, thumbnailUrl, description, channelId, views, likes, dislikes, videoType, comments } = req.body;
-    const uploader = req.user.id;
+    const { title, videoUrl, thumbnailUrl, description, channelId, views, likes, dislikes, videoType, comments, about } = req.body;
+    console.log("👤 req.user:", req.user);
+    const uploader = req.user._id;
 
     const newVideo = new Video({
       title,
@@ -19,6 +20,7 @@ export const uploadVideo = async (req, res) => {
       dislikes,
       videoType,
       comments,
+      about,
     });
 
     await newVideo.save();
@@ -65,6 +67,7 @@ export const getAllVideos = async (req, res) => {
 // // Get video by ID
 export const getVideoById = async (req, res) => {
   try {
+    console.log("Video ID:", req.params.id);
     const video = await Video.findById(req.params.id)
       .populate({
         path: 'uploader',
@@ -218,7 +221,7 @@ export const getAllVideosByUserId = async (req, res) => {
     const videos = await Video.find({ uploader: userId })
       .populate({
         path: 'uploader',
-        select: 'username avatar createdAt channels',
+        select: 'username avatar createdAt channels about',
         populate: {
           path: 'channels',
           select: 'channelName channelBanner subscribers createdAt'

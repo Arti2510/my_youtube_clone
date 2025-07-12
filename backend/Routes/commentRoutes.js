@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 router.post("/comment/:videoId", protect, postComment);
-router.get("/comment/:videoId", getCommentsByVideo);
+router.get("/comment/:videoId", protect, getCommentsByVideo);
 router.put("/comment/:id", protect, updateComment);
 router.delete("/comment/:id", protect, deleteComment);
 

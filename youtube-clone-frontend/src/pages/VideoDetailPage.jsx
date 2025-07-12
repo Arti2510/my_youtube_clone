@@ -12,11 +12,16 @@ function VideoDetailPage() {
   const [comments, setComments] = useState([]);
   let commentData;
   async function fetchVideoById() {
+    const token = localStorage.getItem("token");
     await axios
-      .get(`http://localhost:5100/api/getVideoById/${id}`)
+      .get(`http://localhost:5100/api/getVideoById/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}` // ✅ add Authorization header
+      }
+    })
       .then((res) => {
         let data = res.data;
-        // console.log(data);
+        console.log(data);
         setData(data);
         setVideoUrl(data?.videoUrl);
       })
@@ -25,8 +30,14 @@ function VideoDetailPage() {
       });
   }
   async function getCommentsByVideoId() {
+    const token = localStorage.getItem("token");
     await axios
-      .get(`http://localhost:5100/api/videocomment/comment/${id}`)
+      .get(`http://localhost:5100/api/videocomment/comment/${id}`,{
+        
+        headers: {
+        Authorization: `Bearer ${token}` // ✅ add Authorization header
+      }
+      })
       .then((res) => {
         commentData = res.data;
         console.log(commentData);

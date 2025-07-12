@@ -6,15 +6,22 @@ import axios from 'axios';
 function MainPage({SideNavbar}) {
     const [data, setData] = useState([]);
     useEffect(()=>{
-      axios.get('http://localhost:5100/api/getallvideo')
-      .then((res)=>{
-        let data = res.data;
-        console.log(data);   
-        setData(data);   
-      })
-      .catch((err)=>{
-        console.log(err);      
-      })
+      const fetchVideos = async () => {
+    try {
+      const token = localStorage.getItem("token"); // Get JWT token from localStorage
+      const res = await axios.get("http://localhost:5100/api/getallvideo", {
+        headers: {
+          Authorization: `Bearer ${token}` // Add token to request header
+        },
+      });
+      console.log(res.data);
+      setData(res.data);
+    } catch (err) {
+      console.error("Error fetching videos:", err.response?.data || err.message);
+    }
+  };
+
+  fetchVideos();
     },[]);
 
     const options = ["All", "Music", "Twenty20 Cricket", "Gaming", "LIve", "Debates", "Mixes", "Democracy", "Food", "Daily Soap", "Comedy", "Javascript", "Indian Music", "Banking", "Trading"];
