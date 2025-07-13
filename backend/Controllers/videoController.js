@@ -110,22 +110,7 @@ export const getVideoById = async (req, res) => {
   }
 };
 
-// // Update a video
-// export const updateVideo = async (req, res) => {
-//   try {
-//     const video = await Video.findById(req.params.id);
-//     if (!video) return res.status(404).json({ message: "Video not found" });
-//     // if (video.uploader.toString() !== req.user.id)
-//     if (video.uploader.toString() !== req.user.id) {
-//       return res.status(403).json({ message: "Unauthorized" });
-//     }
 
-//     const updated = await Video.findByIdAndUpdate(req.params.id, req.body, { new: true });
-//     res.status(200).json(updated);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
 export const updateVideo = async (req, res) => {
   try {
     const video = await Video.findById(req.params.id);
@@ -181,47 +166,91 @@ export const deleteVideo = async (req, res) => {
   }
 };
 
-// // Increment views
-// export const incrementViews = async (req, res) => {
-//   try {
-//     const video = await Video.findByIdAndUpdate(
-//       req.params.id,
-//       { $inc: { views: 1 } },
-//       { new: true }
-//     );
-//     res.status(200).json(video);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
+// Like video
+// Like video
+export const likeVideo = async (req, res) => {
+  try {
+    const videoId = req.params.id;
+    const userId = req.user._id?.toString();
 
-// // Like video
-// export const likeVideo = async (req, res) => {
-//   try {
-//     const video = await Video.findById(req.params.id);
-//     if (!video) return res.status(404).json({ message: "Video not found" });
+    console.log("🔐 User ID:", userId);
+    console.log("🎬 Video ID:", videoId);
 
-//     video.likes += 1;
-//     const updated = await video.save();
-//     res.status(200).json(updated);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
+    const video = await Video.findById(videoId);
+    if (!video) return res.status(404).json({ message: "Video not found" });
 
-// // Dislike video
-// export const dislikeVideo = async (req, res) => {
-//   try {
-//     const video = await Video.findById(req.params.id);
-//     if (!video) return res.status(404).json({ message: "Video not found" });
+    // ✅ Fallback for old videos
+    video.likes = video.likes || [];
+    video.dislikes = video.dislikes || [];
 
-//     video.dislikes += 1;
-//     const updated = await video.save();
-//     res.status(200).json(updated);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
+    const likes = video.likes.map(id => id.toString());
+    const dislikes = video.dislikes.map(id => id.toString());
+
+    // Remove from dislikes
+    if (dislikes.includes(userId)) {
+      video.dislikes = video.dislikes.filter(id => id.toString() !== userId);
+    }
+
+    // Toggle like
+    if (likes.includes(userId)) {
+      video.likes = video.likes.filter(id => id.toString() !== userId);
+      console.log("👍 Like removed");
+    } else {
+      video.likes.push(req.user._id);
+      console.log("👍 Like added");
+    }
+
+    const updated = await video.save();
+    res.status(200).json(updated);
+  } catch (err) {
+    console.error("🔥 LIKE VIDEO ERROR:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+// Dislike video
+export const dislikeVideo = async (req, res) => {
+  try {
+    const videoId = req.params.id;
+    const userId = req.user._id?.toString();
+
+    console.log("🔐 User ID:", userId);
+    console.log("🎬 Video ID:", videoId);
+
+    const video = await Video.findById(videoId);
+    if (!video) return res.status(404).json({ message: "Video not found" });
+
+    // Ensure arrays exist
+    video.likes = video.likes || [];
+    video.dislikes = video.dislikes || [];
+
+    const likes = video.likes.map(id => id.toString());
+    const dislikes = video.dislikes.map(id => id.toString());
+
+    // Remove from likes
+    if (likes.includes(userId)) {
+      video.likes = video.likes.filter(id => id.toString() !== userId);
+    }
+
+    // Toggle dislike
+    if (dislikes.includes(userId)) {
+      video.dislikes = video.dislikes.filter(id => id.toString() !== userId);
+      console.log("👎 Dislike removed");
+    } else {
+      video.dislikes.push(req.user._id);
+      console.log("👎 Dislike added");
+    }
+
+    const updated = await video.save();
+    res.status(200).json(updated);
+  } catch (err) {
+    console.error("🔥 DISLIKE VIDEO ERROR:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
 
 export const getAllVideosByUserId = async (req, res) => {
   try {

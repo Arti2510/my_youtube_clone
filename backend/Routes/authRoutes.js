@@ -9,5 +9,8 @@ router.post('/logout', logout);
 
 // Profile route (protected)
 router.get("/profile/:id", protect, getUserProfile);
+router.get("/current", protect, (req, res) => {
+  res.json({ _id: req.user._id });
+});
 
 export default router;

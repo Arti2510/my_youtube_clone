@@ -10,26 +10,124 @@ function VideoDetailPage() {
   const [videoUrl, setVideoUrl] = useState("");
   const { id } = useParams();
   const [comments, setComments] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [profilePic, setProfilePic] = useState("")
+  const [liked, setLiked] = useState(false);
+  const [disliked, setDisliked] = useState(false);
   const navigate = useNavigate();
 
-  const fetchVideoById = async () => {
+  useEffect(()=>{
+    let profileImage = localStorage.getItem("avatar");
+    setProfilePic(profileImage)
+  },[])
+
+  useEffect(() => {
+  const fetchCurrentUser = async () => {
     const token = localStorage.getItem("token");
-    if (!token) return navigate("/");
+    if (!token) return;
 
     try {
-      const res = await axios.get(`http://localhost:5100/api/getVideoById/${id}`, {
+      const res = await axios.get("http://localhost:5100/api/auth/current", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setData(res.data);
-      setVideoUrl(res.data?.videoUrl);
+      setCurrentUserId(res.data._id);
     } catch (err) {
-      console.error(err);
-      if (err.response?.status === 401) {
-        localStorage.removeItem("token");
-        navigate("/");
-      }
+      console.error("Error fetching current user:", err);
     }
   };
+
+  fetchCurrentUser();
+}, []);
+
+  const fetchVideoById = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) return navigate("/");
+
+  try {
+    const res = await axios.get(`http://localhost:5100/api/getVideoById/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setData(res.data);
+    setVideoUrl(res.data?.videoUrl);
+
+    // ✅ Decode user ID from token to check like/dislike status
+    const decodedToken = JSON.parse(atob(token.split(".")[1]));
+    const userId = decodedToken._id || decodedToken.id;
+
+    if (userId) {
+      const liked = res.data.likes?.some(uid => uid === userId);
+      const disliked = res.data.dislikes?.some(uid => uid === userId);
+      setLiked(liked);
+      setDisliked(disliked);
+    }
+    console.log((userId));
+    
+
+  } catch (err) {
+    console.error(err);
+    if (err.response?.status === 401) {
+      localStorage.removeItem("token");
+      navigate("/");
+    }
+  }
+};
+  const handleLike = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) return navigate("/");
+
+  try {
+    const res = await axios.put(
+      `http://localhost:5100/api/video/${id}/like`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setData((prevData) => ({
+  ...prevData,
+  likes: res.data.likes,
+  dislikes: res.data.dislikes,
+}));
+
+    const decodedToken = JSON.parse(atob(token.split(".")[1]));
+const userId = decodedToken._id || decodedToken.id;1
+
+    if (userId) {
+      setLiked(res.data.likes?.some(uid => uid === userId));
+      const decodedToken = JSON.parse(atob(token.split(".")[1]));
+const userId = decodedToken._id || decodedToken.id;
+
+setDisliked(res.data.dislikes?.some(uid => uid === userId));
+setLiked(false);
+    }
+
+  } catch (err) {
+    console.error("Like failed", err);
+  }
+};
+
+const handleDislike = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) return navigate("/");
+
+  try {
+    const res = await axios.put(
+      `http://localhost:5100/api/video/${id}/dislike`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setData((prevData) => ({
+  ...prevData,
+  likes: res.data.likes,
+  dislikes: res.data.dislikes,
+}));
+    setDisliked(res.data.dislikes?.some(dislike => dislike === res.data.uploader._id));
+    setLiked(false);
+  } catch (err) {
+    console.error("Dislike failed", err);
+  }
+};
+
+
 
   const getCommentsByVideoId = async () => {
     const token = localStorage.getItem("token");
@@ -129,15 +227,25 @@ function VideoDetailPage() {
               </div>
             </div>
             <div className="flex gap-[10px] bg-[#a5a5a538] justify-center items-center p-[10px] box-border rounded-[18px] cursor-pointer">
-              <div className="flex gap-[10px]">
-                <ThumbUpOffAltIcon />
-                <div className="font-medium">{data?.likes}</div>
-              </div>
-              <div className="w-0 h-[20px] border"></div>
-              <div className="flex gap-[10px]">
-                <ThumbDownOffAltIcon />
-                <div className="font-medium">{data?.dislikes}</div>
-              </div>
+              <div className="flex gap-[10px] bg-[#a5a5a538] justify-center items-center p-[10px] box-border rounded-[18px]">
+  <div className="flex gap-[10px] cursor-pointer" onClick={handleLike}>
+    {liked ? (
+      <ThumbUpOffAltIcon style={{ color: "skyblue" }} />
+    ) : (
+      <ThumbUpOffAltIcon />
+    )}
+    <div className="font-medium">{data?.likes?.length}</div>
+  </div>
+  <div className="w-0 h-[20px] border"></div>
+  <div className="flex gap-[10px] cursor-pointer" onClick={handleDislike}>
+    {disliked ? (
+      <ThumbDownOffAltIcon style={{ color: "red" }} />
+    ) : (
+      <ThumbDownOffAltIcon />
+    )}
+    <div className="font-medium">{data?.dislikes?.length}</div>
+  </div>
+</div>
             </div>
           </div>
           <div className="flex flex-col bg-[#a5a5a538] w-full rounded-[10px] p-[12px] font-medium text-[14px] gap-[10px] mt-[10px] box-border">
@@ -151,7 +259,7 @@ function VideoDetailPage() {
           <div className="text-[20px] font-medium">{comments.length} Comments</div>
           <div className="flex mt-2.5 gap-2.5">
             <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ2shxjBolAQ3pYz1AJIAv0vd3-7AdOLSQHA&s"
+              src={profilePic}
               alt=""
               className="w-9 h-9 rounded-full"
             />
