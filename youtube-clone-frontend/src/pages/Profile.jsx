@@ -29,7 +29,7 @@ function Profile({ SideNavbar }) {
       setUser(res.data);
 
       // Fetch user's videos separately
-      const videoRes = await axios.get(`http://localhost:5100/api/videos/user/${id}`, {
+      const videoRes = await axios.get(`http://localhost:5100/api/user/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -9,62 +9,85 @@ function MainPage({ SideNavbar }) {
   const [selectedType, setSelectedType] = useState("All");
   const [searchTitle, setSearchTitle] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+useEffect(() => {
+    const checkAuthAndFetch = async () => {
+      const token = localStorage.getItem("token");
 
-  // Listen to search event from Header
-  useEffect(() => {
+      if (token) {
+        setIsLoggedIn(true);
+        try {
+          const res = await axios.get("http://localhost:5100/api/getallvideo", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          console.log(res.data);
+          
+          setData(res.data);
+        } catch (err) {
+          console.error(
+            "Error fetching videos:",
+            err.response?.data || err.message
+          );
+        }
+      } else {
+        setIsLoggedIn(false);
+        setData([]); // ❗ Clear videos if not logged in
+      }
+    };
+
+    checkAuthAndFetch();
+
+    // 👇 Listen for "authChanged" event from Header or other components
+    window.addEventListener("authChanged", checkAuthAndFetch);
+
+    return () => {
+      window.removeEventListener("authChanged", checkAuthAndFetch);
+    };
+  }, []);
+   useEffect(() => {
     const handleSearch = (e) => {
-      setSearchTitle(e.detail); // 'detail' contains the search term
+      setSearchTitle(e.detail);
     };
 
     window.addEventListener("searchVideo", handleSearch);
     return () => window.removeEventListener("searchVideo", handleSearch);
   }, []);
-
-  // Fetch videos when selectedType or searchTitle changes
   useEffect(() => {
-    const fetchVideos = async () => {
-      const token = localStorage.getItem("token");
+  const checkAuthAndFetch = async () => {
+    const token = localStorage.getItem("token");
 
-      if (!token) {
-        setIsLoggedIn(false);
-        setData([]);
-        return;
-      }
-
+    if (token) {
       setIsLoggedIn(true);
-
       try {
-        let url = `http://localhost:5100/api/getallvideo?`;
-        if (selectedType !== "All") {
-          url += `type=${selectedType}&`;
-        }
-        if (searchTitle.trim() !== "") {
-          url += `title=${encodeURIComponent(searchTitle)}`;
-        }
-
-        const res = await axios.get(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
+        const res = await axios.get(
+          `http://localhost:5100/api/getallvideo${selectedType !== "All" ? `?type=${selectedType}` : ""}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(res.data);
         setData(res.data);
       } catch (err) {
         console.error("Error fetching videos:", err.response?.data || err.message);
       }
-    };
+    } else {
+      setIsLoggedIn(false);
+      setData([]);
+    }
+  };
 
-    fetchVideos();
+  checkAuthAndFetch();
 
-    // Re-fetch on login/logout
-    const refetchOnAuth = () => fetchVideos();
-    window.addEventListener("authChanged", refetchOnAuth);
+  window.addEventListener("authChanged", checkAuthAndFetch);
+  return () => {
+    window.removeEventListener("authChanged", checkAuthAndFetch);
+  };
+}, [selectedType]); // 
 
-    return () => {
-      window.removeEventListener("authChanged", refetchOnAuth);
-    };
-  }, [selectedType, searchTitle]);
-
+  
   return (
     <div
       className={
@@ -75,22 +98,20 @@ function MainPage({ SideNavbar }) {
     >
       {isLoggedIn ? (
         <>
-          {/* Category Filters */}
           <div className="flex fixed top-[56px] z-[1] w-full box-border gap-[10px] shrink-0 h-auto overflow-x-scroll bg-black px-4 py-2">
-            {options.map((category, index) => (
-              <div
-                key={index}
-                onClick={() => setSelectedType(category)}
-                className={`text-white flex-none h-[30px] py-[1px] px-[10px] 
-                  ${selectedType === category ? "bg-red-600" : "bg-[rgb(42,42,42)]"} 
-                  font-semibold rounded-[5px] flex justify-center items-center cursor-pointer transition-all`}
-              >
-                {category}
-              </div>
-            ))}
-          </div>
+  {options.map((category, index) => (
+    <div
+      key={index}
+      onClick={() => setSelectedType(category)} // ✅ Updates selected category
+      className={`text-white flex-none h-[30px] py-[1px] px-[10px] 
+        ${selectedType === category ? "bg-red-600" : "bg-[rgb(42,42,42)]"} 
+        font-semibold rounded-[5px] flex justify-center items-center cursor-pointer transition-all`}
+    >
+      {category}
+    </div>
+  ))}
+</div>
 
-          {/* Video Grid */}
           <div
             className={
               SideNavbar

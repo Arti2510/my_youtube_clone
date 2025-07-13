@@ -126,12 +126,12 @@ export const getChannelByUserId = async (req, res) => {
         select: "title thumbnailUrl videoUrl createdAt",
       });
 
-    if (!channel) {
+      if (!channel) {
       return res.status(404).json({ message: "No channel found for this user" });
     }
 
     res.json(channel);
-  } catch (error) {
+    } catch (error) {
     console.error("Error fetching channel by user ID:", error);
     res.status(500).json({ message: "Error fetching channel by user ID" });
   }

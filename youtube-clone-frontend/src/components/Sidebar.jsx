@@ -14,7 +14,7 @@ import { Link, useParams } from 'react-router-dom';
 import "../App.css";
 
 function Sidebar({SideNavbar}) {
-  const channelId = localStorage.getItem("channelId");
+  let channelId = localStorage.getItem("channelId");
   return (
     <div className={SideNavbar?'text-white flex flex-col flex-grow-[0.16] flex-shrink box-border h-[92vh] overflow-y-auto fixed top-[55px] left-0 w-[275px] p-[14px] bg-black':'hidden'}>
       <div className='flex flex-col border-b border-b-[rgb(86,85,85)] pb-[10px]'>

@@ -52,11 +52,12 @@ export const getAllVideos = async (req, res) => {
     // Build dynamic filter
     const filter = {};
     if (type && type !== "All") {
-      filter.videoType = type;
-    }
+  filter.videoType = { $regex: `^${type}$`, $options: "i" }; // exact match, case-insensitive
+}
     if (title && title.trim() !== "") {
       filter.title = { $regex: title, $options: "i" }; // Case-insensitive partial match
     }
+    console.log("🎯 Final filter used:", filter);
 
     const videos = await Video.find(filter)
       .populate({
