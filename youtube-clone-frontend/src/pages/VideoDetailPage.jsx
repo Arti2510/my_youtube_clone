@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
@@ -12,19 +11,15 @@ function VideoDetailPage() {
   const { id } = useParams();
   const [comments, setComments] = useState([]);
   const navigate = useNavigate();
-  let commentData;
+
   const fetchVideoById = async () => {
     const token = localStorage.getItem("token");
     if (!token) return navigate("/");
 
     try {
       const res = await axios.get(`http://localhost:5100/api/getVideoById/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-      console.log(res.data);
-      
       setData(res.data);
       setVideoUrl(res.data?.videoUrl);
     } catch (err) {
@@ -42,15 +37,34 @@ function VideoDetailPage() {
 
     try {
       const res = await axios.get(`http://localhost:5100/api/videocomment/comment/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-      console.log(res.data);
-      
       setComments(res.data);
     } catch (err) {
       console.error(err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/");
+      }
+    }
+  };
+
+  const handleCommentSubmit = async () => {
+    const token = localStorage.getItem("token");
+    if (!token || !message.trim()) return;
+
+    try {
+      await axios.post(
+        `http://localhost:5100/api/videocomment/comment/${id}`,
+        { message },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setMessage(""); // Clear the input
+      getCommentsByVideoId(); // Refresh comments
+    } catch (err) {
+      console.error("Failed to post comment:", err);
       if (err.response?.status === 401) {
         localStorage.removeItem("token");
         navigate("/");
@@ -68,20 +82,13 @@ function VideoDetailPage() {
     };
 
     window.addEventListener("authChanged", handleAuthChange);
-
-    return () => {
-      window.removeEventListener("authChanged", handleAuthChange);
-    };
+    return () => window.removeEventListener("authChanged", handleAuthChange);
   }, [id, navigate]);
 
-  // function handleOnChangeInp(event, name) {
-  //   setComment({
-  //     ...comment,[name]:event.target.value
-  //   })
-  // }
   return (
     <div className="mt-[56px] flex py-[30px] px-0 justify-center bg-black text-white">
       <div className="w-full max-w-[875px] flex flex-col">
+        {/* Video Player */}
         <div className="w-full">
           {videoUrl ? (
             <video
@@ -99,14 +106,12 @@ function VideoDetailPage() {
           )}
         </div>
 
+        {/* Video Details */}
         <div className="flex flex-col">
           <div className="text-[20px] font-bold">{data?.title}</div>
           <div className="flex justify-between mt-[10px]">
             <div className="flex gap-[15px]">
-              <Link
-                to={`/user/${data?.uploader?._id}`}
-                className="w-[35px] h-[35px] cursor-pointer"
-              >
+              <Link to={`/user/${data?.uploader?._id}`} className="w-[35px] h-[35px] cursor-pointer">
                 <img
                   src={data?.uploader?.avatar}
                   alt=""
@@ -114,9 +119,7 @@ function VideoDetailPage() {
                 />
               </Link>
               <div className="flex flex-col">
-                <div className="font-medium text-base">
-                  {data?.channelId?.[0]?.channelName}
-                </div>
+                <div className="font-medium text-base">{data?.channelId?.[0]?.channelName}</div>
                 <div className="text-sm text-[#AAAAAA]">
                   {data?.channelId?.[0]?.createdAt.slice(0, 10)}
                 </div>
@@ -138,10 +141,12 @@ function VideoDetailPage() {
             </div>
           </div>
           <div className="flex flex-col bg-[#a5a5a538] w-full rounded-[10px] p-[12px] font-medium text-[14px] gap-[10px] mt-[10px] box-border">
-            <div>{data?.createdAt.slice(0, 10)}</div>
+            <div>{data?.createdAt?.slice(0, 10)}</div>
             <div>{data?.description}</div>
           </div>
         </div>
+
+        {/* Comments Section */}
         <div className="flex flex-col mt-5">
           <div className="text-[20px] font-medium">{comments.length} Comments</div>
           <div className="flex mt-2.5 gap-2.5">
@@ -154,120 +159,71 @@ function VideoDetailPage() {
               <input
                 type="text"
                 value={message}
-                onChange={(e) => {
-                  setMessage(e.target.value);
-                }}
+                onChange={(e) => setMessage(e.target.value)}
                 placeholder="Add a Comment"
                 className="w-full bg-black text-white h-9 border-0 text-base border-b border-gray-500 focus:outline-none placeholder:text-[16px]"
               />
               <div className="flex justify-end gap-4 mt-2.5">
-                <div className="py-[8px] px-[16px] rounded-[18px] border cursor-pointer hover:bg-white hover:text-black">
+                <div
+                  onClick={() => setMessage("")}
+                  className="py-[8px] px-[16px] rounded-[18px] border cursor-pointer hover:bg-white hover:text-black"
+                >
                   Cancel
                 </div>
-                <div className="py-[8px] px-[16px] rounded-[18px] border cursor-pointer hover:bg-white hover:text-black">
+                <div
+                  onClick={handleCommentSubmit}
+                  className={`py-[8px] px-[16px] rounded-[18px] border cursor-pointer hover:bg-white hover:text-black ${
+                    message.trim() ? "" : "opacity-50 cursor-not-allowed"
+                  }`}
+                >
                   Comment
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Comment List */}
           <div className="flex flex-col gap-2.5">
-            {comments?.map((item, index) => {
-              return (
-                <div key={item._id} className="flex mt-2.5 gap-2.5">
-                  <img
-                    src={item?.user?.avatar}
-                    alt=""
-                    className="w-9 h-9 rounded-full"
-                  />
-                  <div className="flex flex-col">
-                    <div className="flex gap-2.5">
-                      <div className="text-sm font-medium">{item?.user?.username}</div>
-                      <div className="text-sm text-[#AAAAAA]">{item?.createdAt.slice(0,10)}</div>
-                    </div>
-                    <div className="mt-2.5">
-                      {item?.message}
-                    </div>
+            {comments?.map((item) => (
+              <div key={item._id} className="flex mt-2.5 gap-2.5">
+                <img
+                  src={item?.user?.avatar}
+                  alt=""
+                  className="w-9 h-9 rounded-full"
+                />
+                <div className="flex flex-col">
+                  <div className="flex gap-2.5">
+                    <div className="text-sm font-medium">{item?.user?.username}</div>
+                    <div className="text-sm text-[#AAAAAA]">{item?.createdAt.slice(0, 10)}</div>
                   </div>
+                  <div className="mt-2.5">{item?.message}</div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
+      {/* Right Sidebar - Suggested Videos */}
       <div className="w-full max-w-[406px] py-[10px] px-[15px] gap-[15px] flex flex-col text-white">
-        <div className="flex gap-[15px] cursor-pointer">
-          <div className="w-[168px] h-[94px]">
-            <img
-              src="https://img.youtube.com/vi/N1GfjzSJmiQ/maxresdefault.jpg"
-              alt=""
-              className="w-inherit"
-            />
-          </div>
-          <div className="flex flex-col gap-[3px]">
-            <div className="text-[15px] font-medium mb-[5px]">
-              T20 world cup final #India.
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="flex gap-[15px] cursor-pointer">
+            <div className="w-[168px] h-[94px]">
+              <img
+                src="https://img.youtube.com/vi/N1GfjzSJmiQ/maxresdefault.jpg"
+                alt=""
+                className="w-inherit"
+              />
             </div>
-            <div className="text-[#ffffff9c] text-[12px]">Cricket 320</div>
-            <div className="text-[#ffffff9c] text-[12px]">
-              136K views . 1 day ago
-            </div>
-          </div>
-        </div>
-        <div className="flex gap-[15px] cursor-pointer">
-          <div className="w-[168px] h-[94px]">
-            <img
-              src="https://img.youtube.com/vi/N1GfjzSJmiQ/maxresdefault.jpg"
-              alt=""
-              className="w-inherit"
-            />
-          </div>
-          <div className="flex flex-col gap-[3px]">
-            <div className="text-[15px] font-medium mb-[5px]">
-              T20 world cup final #India.
-            </div>
-            <div className="text-[#ffffff9c] text-[12px]">Cricket 320</div>
-            <div className="text-[#ffffff9c] text-[12px]">
-              136K views . 1 day ago
+            <div className="flex flex-col gap-[3px]">
+              <div className="text-[15px] font-medium mb-[5px]">
+                T20 world cup final #India.
+              </div>
+              <div className="text-[#ffffff9c] text-[12px]">Cricket 320</div>
+              <div className="text-[#ffffff9c] text-[12px]">136K views · 1 day ago</div>
             </div>
           </div>
-        </div>
-        <div className="flex gap-[15px] cursor-pointer">
-          <div className="w-[168px] h-[94px]">
-            <img
-              src="https://img.youtube.com/vi/N1GfjzSJmiQ/maxresdefault.jpg"
-              alt=""
-              className="w-inherit"
-            />
-          </div>
-          <div className="flex flex-col gap-[3px]">
-            <div className="text-[15px] font-medium mb-[5px]">
-              T20 world cup final #India.
-            </div>
-            <div className="text-[#ffffff9c] text-[12px]">Cricket 320</div>
-            <div className="text-[#ffffff9c] text-[12px]">
-              136K views . 1 day ago
-            </div>
-          </div>
-        </div>
-        <div className="flex gap-[15px] cursor-pointer">
-          <div className="w-[168px] h-[94px]">
-            <img
-              src="https://img.youtube.com/vi/N1GfjzSJmiQ/maxresdefault.jpg"
-              alt=""
-              className="w-inherit"
-            />
-          </div>
-          <div className="flex flex-col gap-[3px]">
-            <div className="text-[15px] font-medium mb-[5px]">
-              T20 world cup final #India.
-            </div>
-            <div className="text-[#ffffff9c] text-[12px]">Cricket 320</div>
-            <div className="text-[#ffffff9c] text-[12px]">
-              136K views . 1 day ago
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
