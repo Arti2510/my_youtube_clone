@@ -5,14 +5,22 @@ import User from "../Models/User.model.js";
 export const createChannel = async (req, res) => {
   try {
     const { channelName, description, channelBanner, subscribers, video } = req.body;
-    const user = req.user.id; // from auth middleware
+    const userId = req.user.id; // from auth middleware
 
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.channels) {
+      return res.status(400).json({ message: "User already has a channel" });
+    }
     // Check for existing channel name
     const existing = await Channel.findOne({ channelName });
     if (existing) return res.status(400).json({ message: "Channel name already taken" });
 
     const newChannel = new Channel({ channelName, description, channelBanner, user, subscribers, video });
     await newChannel.save();
+
+    user.channels = newChannel._id;
+    await user.save(); // ✅ This is what persists the update
 
     res.status(201).json({ message: "Channel created", channel: newChannel });
   } catch (error) {

@@ -5,7 +5,7 @@ import { uploadVideo, getAllVideos, getVideoById, getAllVideosByUserId, updateVi
 import express from 'express';
 const router = express.Router();
 
-router.post('/video', protect, uploadVideo);
+router.post('/:userId/:channelId/uploadVideo', protect, uploadVideo);
 router.get('/getallvideo', getAllVideos);
 router.get('/getVideoById/:id', getVideoById);
 router.get('/:userId/channel', getAllVideosByUserId);

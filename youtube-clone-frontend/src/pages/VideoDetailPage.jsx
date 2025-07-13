@@ -47,7 +47,8 @@ function VideoDetailPage() {
     const res = await axios.get(`http://localhost:5100/api/getVideoById/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-
+    console.log(res.data);
+    
     setData(res.data);
     setVideoUrl(res.data?.videoUrl);
 
@@ -209,7 +210,7 @@ const handleDislike = async () => {
           <div className="text-[20px] font-bold">{data?.title}</div>
           <div className="flex justify-between mt-[10px]">
             <div className="flex gap-[15px]">
-              <Link to={`/user/${data?.uploader?._id}`} className="w-[35px] h-[35px] cursor-pointer">
+              <Link to={`/channel/${data?.channelId?._id}`} className="w-[35px] h-[35px] cursor-pointer">
                 <img
                   src={data?.uploader?.avatar}
                   alt=""

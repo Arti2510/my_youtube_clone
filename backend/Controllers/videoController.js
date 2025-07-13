@@ -1,11 +1,19 @@
 
 import Video from "../Models/Video.model.js";
+import channel from "../Models/Channel.model.js";
 
 // Create a new video
 export const uploadVideo = async (req, res) => {
   try {
-    const { title, videoUrl, thumbnailUrl, description, channelId, views, likes, dislikes, videoType, comments } = req.body;
-    const uploader = req.user._id;
+    console.log("📥 Video upload request body:", req.body);
+    console.log("🔐 Authenticated user:", req.user);
+
+    const { title, videoUrl, thumbnailUrl, description, channelId, videoType } = req.body;
+    const uploader = req.user?._id;
+
+    if (!title || !videoUrl || !thumbnailUrl || !description) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
 
     const newVideo = new Video({
       title,
@@ -14,19 +22,28 @@ export const uploadVideo = async (req, res) => {
       description,
       uploader,
       videoType: videoType || "All",
-      channelId: channelId ? [channelId] : [],
-      views: views || 0,
-      likes: likes || 0,
-      dislikes: dislikes || 0,
-      comments: comments || [],
+      channelId: channelId,
+      views: 0,
+      likes: [],
+      dislikes: [],
+      comments: [],
     });
 
+    console.log("📺 channelId received:", channelId);
+
     await newVideo.save();
-    res.status(201).json({ message: "Video uploaded", video: newVideo });
+    await channel.findByIdAndUpdate(
+  channelId,
+  { $push: { video: newVideo._id } }, // ✅ correct field name and variable
+  { new: true }
+);
+    res.status(201).json({ message: "✅ Video uploaded", video: newVideo });
   } catch (err) {
+    console.error("❌ Upload error:", err);
     res.status(500).json({ message: err.message });
   }
 };
+
 
 export const getAllVideos = async (req, res) => {
   try {

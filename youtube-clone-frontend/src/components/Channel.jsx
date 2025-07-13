@@ -31,6 +31,9 @@ function Channel({ SideNavbar }) {
         });
         console.log("Channel Data:", res.data);
         setChannel(res.data);
+        if (res.data._id) {
+            localStorage.setItem("channelId", res.data._id);
+        }
       } catch (err) {
         console.error("Error loading channel:", err);
         if (err.response?.status === 404) {
@@ -83,14 +86,14 @@ function Channel({ SideNavbar }) {
           <h2 className="text-2xl font-semibold mb-3">Videos</h2>
           <div className="flex flex-wrap gap-4">
             {channel.video?.map((vid) => (
-              <Link to={`/watch/${vid._id}`} key={vid._id} className="w-[240px]">
-                <div className="w-full h-[140px] mb-2">
-                  <img
-                    src={vid.thumbnailUrl || "https://via.placeholder.com/240x140"}
-                    alt={vid.title}
-                    className="w-full h-full object-cover rounded-md"
-                  />
-                </div>
+      <Link to={`/watch/${vid._id}`} key={vid._id} className="w-[240px]">
+        <div className="w-full h-[140px] mb-2">
+          <img
+            src={vid.thumbnailUrl || "https://via.placeholder.com/240x140"}
+            alt={vid.title}
+            className="w-full h-full object-cover rounded-md"
+          />
+        </div>
                 <div>
                   <h3 className="font-medium truncate">{vid.title}</h3>
                   <p className="text-sm text-gray-400">
