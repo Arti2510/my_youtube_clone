@@ -4,8 +4,7 @@ import Video from "../Models/Video.model.js";
 // Create a new video
 export const uploadVideo = async (req, res) => {
   try {
-    const { title, videoUrl, thumbnailUrl, description, channelId, views, likes, dislikes, videoType, comments, about } = req.body;
-    console.log("👤 req.user:", req.user);
+    const { title, videoUrl, thumbnailUrl, description, channelId, views, likes, dislikes, videoType, comments } = req.body;
     const uploader = req.user._id;
 
     const newVideo = new Video({
@@ -13,14 +12,13 @@ export const uploadVideo = async (req, res) => {
       videoUrl,
       thumbnailUrl,
       description,
-      channelId,
       uploader,
-      views,
-      likes,
-      dislikes,
-      videoType,
-      comments,
-      about,
+      videoType: videoType || "All",
+      channelId: channelId ? [channelId] : [],
+      views: views || 0,
+      likes: likes || 0,
+      dislikes: dislikes || 0,
+      comments: comments || [],
     });
 
     await newVideo.save();
@@ -32,9 +30,18 @@ export const uploadVideo = async (req, res) => {
 
 export const getAllVideos = async (req, res) => {
   try {
-    console.log("Fetching videos for user:", req.user);
+    const { type, title } = req.query;
 
-    const videos = await Video.find()
+    // Build dynamic filter
+    const filter = {};
+    if (type && type !== "All") {
+      filter.videoType = type;
+    }
+    if (title && title.trim() !== "") {
+      filter.title = { $regex: title, $options: "i" }; // Case-insensitive partial match
+    }
+
+    const videos = await Video.find(filter)
       .populate({
         path: 'uploader',
         select: 'username avatar createdAt channels',
@@ -52,7 +59,7 @@ export const getAllVideos = async (req, res) => {
           populate: {
             path: 'channels',
             select: 'channelName',
-          }
+          },
         },
       });
 
@@ -62,6 +69,8 @@ export const getAllVideos = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+
 
 
 // // Get video by ID

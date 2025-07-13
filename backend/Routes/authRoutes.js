@@ -1,13 +1,13 @@
 import { register, login, logout , getUserProfile } from '../Controllers/authController.js';
 import express from 'express';
+import { protect } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 router.post('/register', register);
 router.post('/login', login);
 router.post('/logout', logout);
 
-// Profile route
-router.get("/:id", getUserProfile);
-
+// Profile route (protected)
+router.get("/profile/:id", protect, getUserProfile);
 
 export default router;

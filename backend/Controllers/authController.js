@@ -1,11 +1,9 @@
-
 import User from "../Models/User.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const register = async (req, res, next) => {
-    
-  const { username, email, password, avatar, channelId, about } = req.body;
+  const { username, email, password, avatar, about } = req.body;
 
   if (!username || username.trim() === '') {
     return res.status(400).json({ error: 'Full name is required' });
@@ -38,11 +36,9 @@ export const register = async (req, res, next) => {
       email,
       password: hashedPassword,
       avatar,
-      channelId,
       about,
     });
     await newUser.save();
-
     res.status(201).json({
       message: 'User registered successfully',
       user: {
@@ -50,7 +46,7 @@ export const register = async (req, res, next) => {
         username: newUser.username,
         email: newUser.email,
         avatar: newUser.avatar,
-        channelId: newUser.channelId,
+        channels: newUser.channels,
       }
     });
   } catch (err) {
@@ -82,8 +78,8 @@ export const login = async (req, res, next) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax", // Or "None" if frontend & backend are on different domains and using HTTPS
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      sameSite: "Lax",
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     res.json({

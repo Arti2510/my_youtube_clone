@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from "react";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function VideoDetailPage() {
@@ -10,49 +11,68 @@ function VideoDetailPage() {
   const [videoUrl, setVideoUrl] = useState("");
   const { id } = useParams();
   const [comments, setComments] = useState([]);
+  const navigate = useNavigate();
   let commentData;
-  async function fetchVideoById() {
+  const fetchVideoById = async () => {
     const token = localStorage.getItem("token");
-    await axios
-      .get(`http://localhost:5100/api/getVideoById/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}` // ✅ add Authorization header
-      }
-    })
-      .then((res) => {
-        let data = res.data;
-        console.log(data);
-        setData(data);
-        setVideoUrl(data?.videoUrl);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-  async function getCommentsByVideoId() {
-    const token = localStorage.getItem("token");
-    await axios
-      .get(`http://localhost:5100/api/videocomment/comment/${id}`,{
-        
+    if (!token) return navigate("/");
+
+    try {
+      const res = await axios.get(`http://localhost:5100/api/getVideoById/${id}`, {
         headers: {
-        Authorization: `Bearer ${token}` // ✅ add Authorization header
-      }
-      })
-      .then((res) => {
-        commentData = res.data;
-        console.log(commentData);
-        setComments(commentData);
-        // setData(data);
-        // setVideoUrl(data?.videoUrl);
-      })
-      .catch((err) => {
-        console.log(err);
+          Authorization: `Bearer ${token}`,
+        },
       });
-  }
+      console.log(res.data);
+      
+      setData(res.data);
+      setVideoUrl(res.data?.videoUrl);
+    } catch (err) {
+      console.error(err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/");
+      }
+    }
+  };
+
+  const getCommentsByVideoId = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/");
+
+    try {
+      const res = await axios.get(`http://localhost:5100/api/videocomment/comment/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(res.data);
+      
+      setComments(res.data);
+    } catch (err) {
+      console.error(err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/");
+      }
+    }
+  };
+
   useEffect(() => {
     fetchVideoById();
     getCommentsByVideoId();
-  }, []);
+
+    const handleAuthChange = () => {
+      const token = localStorage.getItem("token");
+      if (!token) navigate("/");
+    };
+
+    window.addEventListener("authChanged", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("authChanged", handleAuthChange);
+    };
+  }, [id, navigate]);
 
   // function handleOnChangeInp(event, name) {
   //   setComment({

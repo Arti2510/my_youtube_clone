@@ -3,14 +3,15 @@
 import { protect } from "../middleware/authMiddleware.js"; // optional JWT middleware
 import express from 'express';
 const router = express.Router();
-import { createChannel, getAllChannels, getChannelById, updateChannel, deleteChannel } from "../Controllers/channelController.js";
+import { createChannel, getAllChannels, getChannelById, updateChannel, deleteChannel, getChannelByUserId, } from "../Controllers/channelController.js";
 
 
-router.post("/channel", protect, createChannel);
+router.post("/:userId/channel", protect, createChannel);
 router.get("/channels", getAllChannels); 
 router.get("/channel/:id", getChannelById); 
 router.put("/channel/:id", protect, updateChannel); 
-router.delete("/channel/:id", protect, deleteChannel); 
+router.delete("/channel/:id", protect, deleteChannel);
+router.get("/channel/user/:userId", protect, getChannelByUserId); 
 
 
 

@@ -7,7 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 function Login({setLOginModel}) {
   const [loader, setLoader] = useState(false);
-  const [loginField, setloginField] = useState({"email":"", "passwprd":""});
+  const [loginField, setloginField] = useState({"email":"", "password":""});
 
   function handleOnChangeInp(event, name) {
     setloginField({
@@ -16,26 +16,55 @@ function Login({setLOginModel}) {
   }
   async function handleLogin() {
     setLoader(true);
-    await axios.post('http://localhost:5100/auth/login', loginField)
-    .then((res)=>{
+    try {
+      const res = await axios.post('http://localhost:5100/api/auth/login', loginField);
+
       setLoader(false);
-      console.log(res.data);
       toast.success(res.data.message);
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem("UserId", res.data.user.id);
-      localStorage.setItem("UserName", res.data.user.username);
-      localStorage.setItem("Email", res.data.user.email);
-      localStorage.setItem("channels", res.data.user.channels);
-      localStorage.setItem("avatar", res.data.user.avatar);
+
+      const { token, user } = res.data;
+
+      // Save user details
+      localStorage.setItem('token', token);
+      localStorage.setItem("UserId", user.id);
+      localStorage.setItem("UserName", user.username);
+      localStorage.setItem("Email", user.email);
+      localStorage.setItem("channels", user.channels);
+      localStorage.setItem("avatar", user.avatar);
+
+      // 🔽 Fetch the user's channel
+      try {
+  console.log("→ Getting channel for user ID:", res.data); // ✅
+
+  const channelRes = await axios.get(
+    `http://localhost:5100/api/userchannel/channel/user/${user.id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  console.log("✅ Channel response received:", channelRes); // ✅
+  console.log("✅ channelRes.data:", channelRes.data); // ✅
+        const channelId = channelRes.data?._id;
+        if (channelId) {
+          localStorage.setItem("channelId", channelId); // ✅ Save channel ID
+        }
+      } catch (channelErr) {
+        console.warn("No channel found for this user");
+        localStorage.removeItem("channelId");
+      }
+
+      window.dispatchEvent(new Event("authChanged"));
       window.location.reload();
-    }) 
-    .catch((err)=>{
+    } catch (err) {
       setLoader(false);
-      toast.error("Invalid Credentials.")
+      toast.error("Invalid Credentials.");
       console.log(err);
-      
-    })  
+    }
   }
+
   return (
     <div style={{ fontOpticalSizing: 'auto' }} className='w-full h-full bg-[hsla(0,0%,0%,1)] fixed top-0 text-white flex justify-center font-["Oswald", "sans-serif"] font-normal not-italic' >
       <div className='w-[40%] h-[60%] mt-[100px] bg-black box-border p-[60px] flex flex-col items-center shadow-[0.5px_0.5px_8px_white]'>

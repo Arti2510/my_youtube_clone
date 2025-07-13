@@ -42,7 +42,7 @@ export const getAllChannels = async (req, res) => {
 export const getChannelById = async (req, res) => {
   try {
     const channel = await Channel.findById(req.params.id)
-      .populate("user", "username email")
+      .populate("user", "username email avatar")
       .populate({
         path: "video",
         select: "title thumbnailUrl videoUrl createdAt"
@@ -105,5 +105,26 @@ export const deleteChannel = async (req, res) => {
   } catch (error) {
     console.error("Error deleting channel:", error);
     res.status(500).json({ message: "Error deleting channel" });
+  }
+};
+
+export const getChannelByUserId = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const channel = await Channel.findOne({ user: userId })
+      .populate("user", "username email avatar")
+      .populate({
+        path: "video",
+        select: "title thumbnailUrl videoUrl createdAt",
+      });
+
+    if (!channel) {
+      return res.status(404).json({ message: "No channel found for this user" });
+    }
+
+    res.json(channel);
+  } catch (error) {
+    console.error("Error fetching channel by user ID:", error);
+    res.status(500).json({ message: "Error fetching channel by user ID" });
   }
 };

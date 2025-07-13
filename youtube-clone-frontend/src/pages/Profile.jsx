@@ -1,60 +1,90 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Profile({ SideNavbar }) {
   const { id } = useParams();
-  const [data, setData] = useState([]);
   const [user, setUser] = useState(null);
+  const [videos, setVideos] = useState([]);
+  const navigate = useNavigate();
+
   async function fetchProfileData() {
     const token = localStorage.getItem("token");
-    axios
-      .get(`http://localhost:5100/api/${id}/channel`,{
+    if (!token) {
+      navigate("/");
+      return;
+    }
+
+    try {
+      // Fetch user profile
+      const res = await axios.get(`http://localhost:5100/api/auth/profile/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}` // Add token to request header
+          Authorization: `Bearer ${token}`,
         },
-      })
-      .then((res) => {
-        console.log(res.data);
-        // res.data[0]?.uploader?.channels[0]?.channelName
-        setData(res.data);
-        setUser(res.data[0]?.uploader);
-        console.log(res.data[0]?.uploader);
-        //res.data[0]?.uploader?.username
-      })
-      .catch((err) => {
-        console.log(err);
       });
+
+      console.log("User data:", res.data);
+      setUser(res.data);
+
+      // Fetch user's videos separately
+      const videoRes = await axios.get(`http://localhost:5100/api/videos/user/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("User's videos:", videoRes.data);
+      setVideos(videoRes.data);
+
+    } catch (err) {
+      console.error(err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/");
+      }
+    }
   }
+
   useEffect(() => {
     fetchProfileData();
-  }, []);
+
+    const handleAuthChange = () => {
+      const token = localStorage.getItem("token");
+      if (!token) navigate("/");
+    };
+
+    window.addEventListener("authChanged", handleAuthChange);
+    return () => window.removeEventListener("authChanged", handleAuthChange);
+  }, [id, navigate]);
+
+  if (!user) {
+    return <div className="text-white flex justify-center items-center h-screen">Loading...</div>;
+  }
+
   return (
     <div className="flex w-full pt-[10px] pr-[13px] pb-0 pl-[13px] box-border bg-black text-white">
       <Sidebar SideNavbar={SideNavbar} />
       <div
         className={
           SideNavbar
-            ? "flex flex-col overflow-x-hidden flex: 1 1 0% ml-[270px] text-white mt-14 justify-center items-center w-3/4"
-            : "flex flex-col overflow-x-hidden flex: 1 1 0% text-white mt-14 justify-center items-center w-full"
+            ? "flex flex-col overflow-x-hidden ml-[270px] mt-14 justify-center items-center w-3/4"
+            : "flex flex-col overflow-x-hidden mt-14 justify-center items-center w-full"
         }
       >
-        <div className="w-full flex pt-0 pr-0 pb-[20px] pl-0">
+        <div className="w-full flex pb-[20px]">
           <div className="w-[150px] h-[150px]">
             <img
               src={user?.avatar}
-              alt=""
+              alt="avatar"
               className="w-full h-full rounded-full"
             />
           </div>
-          <div className="flex flex-col gap-[7px] py-0 px-[10px] w-[85%]">
-            <div className="text-4xl font-semibold">
-              {data[0]?.uploader?.channels[0]?.channelName}
-            </div>
+          <div className="flex flex-col gap-[7px] px-[10px] w-[85%]">
+            <div className="text-4xl font-semibold">{user?.username}</div>
             <div className="text-[16px] text-[rgb(153,153,153)]">
-              {user?.username} . {data.length} videos
+              {user?.username} • {videos.length} videos
             </div>
             <div className="text-[16px] text-[rgb(153,153,153)]">
               {user?.about}
@@ -67,27 +97,25 @@ function Profile({ SideNavbar }) {
             Videos &nbsp; <ArrowRightIcon />
           </div>
           <div className="flex gap-2.5 h-screen flex-wrap mt-5">
-            {data.map((item, index) => {
-              return (
-                <Link to={`/watch/${item?._id}`} key={item._id} className="w-[210px] cursor-pointer">
-                  <div className="w-full h-[140px]">
-                    <img
-                      src={item?.thumbnailUrl}
-                      alt=""
-                      className="w-full h-full"
-                    />
+            {videos.map((item) => (
+              <Link to={`/watch/${item?._id}`} key={item._id} className="w-[210px] cursor-pointer">
+                <div className="w-full h-[140px]">
+                  <img
+                    src={item?.thumbnailUrl}
+                    alt={item?.title}
+                    className="w-full h-full"
+                  />
+                </div>
+                <div className="flex flex-col w-full">
+                  <div className="w-full text-[16px] font-semibold">
+                    {item?.title}
                   </div>
-                  <div className="flex flex-col w-full">
-                    <div className="w-full text-[16px] font-semibold">
-                      {item?.title}
-                    </div>
-                    <div className="text-[#ababab] text-[13px]">
-                      Create at {item?.createdAt.slice(0,10)}
-                    </div>
+                  <div className="text-[#ababab] text-[13px]">
+                    Created at {item?.createdAt ? item.createdAt.slice(0, 10) : "N/A"}
                   </div>
-                </Link>
-              );
-            })}
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </div>

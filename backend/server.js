@@ -13,10 +13,15 @@ dotenv.config();
 
 const app = express();
 
+// Allow credentials and specify frontend origin
 app.use(cors());
 app.use(express.json());  // middleware for json data
 
-app.use('/auth', authRoutes);
+// Health check route
+app.get("/", (req, res) => res.send("API running"));
+
+// Use /api/auth for consistency
+app.use('/api/auth', authRoutes);
 app.use('/api', videoRoutes);
 app.use('/api/videocomment', commentRoutes);
 app.use('/api/userchannel', channelRoutes);
