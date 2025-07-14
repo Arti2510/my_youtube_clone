@@ -197,9 +197,9 @@ Node.js
 
 ## 📸 Screenshots
 
-> Below are some UI previews from the frontend of the YouTube Clone app.
-
 ### 🏠 Homepage
 Displays a grid of videos with thumbnails, titles, and uploader info.
 
+screenrecord video link
+screenrecording link : https://drive.google.com/file/d/1QAXHrR6o5WkBk1LJgP6tmE0BT_Rt7qix/view?usp=sharing
 
