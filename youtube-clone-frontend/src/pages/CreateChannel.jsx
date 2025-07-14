@@ -89,58 +89,69 @@ function CreateChannel() {
 };
 
   return (
-    <div className="text-white bg-black h-screen flex justify-center items-center flex-col mt-14">
-      <ToastContainer />
-      <div className="w-[40%] border border-white p-8 rounded shadow-lg">
-        <h2 className="text-3xl mb-6 text-center font-bold">Create Channel</h2>
+  <div className="text-white bg-black min-h-screen flex justify-center items-center flex-col px-4 pt-20 sm:pt-24">
+    <ToastContainer />
+    <div className="w-full max-w-lg border border-white p-6 sm:p-8 rounded shadow-lg bg-[#111]">
+      <h2 className="text-2xl sm:text-3xl mb-6 text-center font-bold">Create Channel</h2>
 
+      {/* Channel Name */}
+      <input
+        type="text"
+        name="channelName"
+        placeholder="Channel Name"
+        value={channelData.channelName}
+        onChange={handleChange}
+        className="w-full mb-4 p-2 bg-[#222] text-white rounded"
+      />
+
+      {/* Description */}
+      <textarea
+        name="description"
+        placeholder="Channel Description"
+        value={channelData.description}
+        onChange={handleChange}
+        rows={4}
+        className="w-full mb-4 p-2 bg-[#222] text-white rounded"
+      ></textarea>
+
+      {/* Banner Upload */}
+      <div className="text-center font-medium mb-2">Channel Banner</div>
+      <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
         <input
-          type="text"
-          name="channelName"
-          placeholder="Channel Name"
-          value={channelData.channelName}
-          onChange={handleChange}
-          className="w-full mb-4 p-2 bg-[#222] text-white rounded"
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          className="file:bg-white file:text-black file:border file:border-gray-300 file:px-4 file:py-2 file:rounded hover:file:bg-[#ede1e1]"
         />
-        <textarea
-          name="description"
-          placeholder="Channel Description"
-          value={channelData.description}
-          onChange={handleChange}
-          rows={4}
-          className="w-full mb-4 p-2 bg-[#222] text-white rounded"
-        ></textarea>
+      </div>
 
-        <div className="flex justify-center">Channel Banner</div>
-        <div className="flex items-center gap-2 justify-center my-2.5">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="file:bg-white file:text-black file:border file:border-gray-300 file:px-4 file:py-2 file:rounded hover:file:bg-[#ede1e1]"
-          />
-        </div>
-
-        {channelData.thumbnail && (
+      {/* Thumbnail Preview */}
+      {channelData.thumbnail && (
+        <div className="flex justify-center mb-4">
           <img
             src={channelData.thumbnail}
             alt="Banner"
-            className="w-32 h-32 object-cover rounded-full mb-4"
+            className="w-32 h-32 object-cover rounded-full border"
           />
-        )}
+        </div>
+      )}
 
-        {loader && <LinearProgress />}
+      {/* Loader */}
+      {loader && <LinearProgress className="mb-4" />}
 
-        <button
-          onClick={handleSubmit}
-          disabled={loader}
-          className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded"
-        >
-          Create Channel
-        </button>
-      </div>
+      {/* Submit Button */}
+      <button
+        onClick={handleSubmit}
+        disabled={loader}
+        className={`w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded ${
+          loader ? "cursor-not-allowed opacity-70" : ""
+        }`}
+      >
+        Create Channel
+      </button>
     </div>
-  );
+  </div>
+);
 }
 
 export default CreateChannel;

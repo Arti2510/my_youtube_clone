@@ -70,50 +70,102 @@ function RegisterPage() {
   }
 
   return (
-    <div className='mt-14 text-white w-full flex flex-col items-center h-screen bg-black'>
-      <div className='w-[90%] sm:w-[60%] md:w-[40%] border py-[15px] px-[25px] mt-[30px] flex flex-col items-center justify-center shadow-[0.5px_0.5px_8px_white]'>
-        <div className='flex gap-5 w-full justify-center items-center text-[32px] font-["Oswald", "sans-serif"] font-normal non-italic'>
-          <img className='mr-1.5' src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png" alt="yt" height="35" width="35" />
-          SignUp
-        </div>
-
-        <div className='gap-5 w-full flex justify-center items-center flex-col mt-[30px]'>
-          <input type="text" placeholder='User Name' value={signUpField.username} onChange={(e) => handleInpField(e, "username")} className='w-[80%] h-[45px] text-white py-0 px-[10px] border-0 rounded-[5px] bg-[#222222]' />
-          <input type="email" placeholder='Email' value={signUpField.email} onChange={(e) => handleInpField(e, "email")} className='w-[80%] h-[45px] text-white py-0 px-[10px] border-0 rounded-[5px] bg-[#222222]' />
-          <input type="password" placeholder='Password' value={signUpField.password} onChange={(e) => handleInpField(e, "password")} className='w-[80%] h-[45px] text-white py-0 px-[10px] border-0 rounded-[5px] bg-[#222222]' />
-          <input type="text" placeholder='About Yourself' value={signUpField.about} onChange={(e) => handleInpField(e, "about")} className='w-[80%] h-[45px] text-white py-0 px-[10px] border-0 rounded-[5px] bg-[#222222]' />
-
-          <div className='flex flex-col sm:flex-row items-center gap-[20px] mt-4'>
-            <input type="file" onChange={uploadedImage} className="file:bg-white file:text-black file:border file:border-gray-300 file:px-4 file:py-2 file:rounded hover:file:bg-[#ede1e1]" />
-            <div className='w-[80px] h-[80px] overflow-hidden rounded-full'>
-              <img src={uploadedImageUrl} alt="avatar-preview" className='w-full h-full object-cover' />
-            </div>
-          </div>
-
-          <div className='w-full flex items-center gap-[30px] justify-center mt-5'>
-            <button
-              onClick={handleSignUp}
-              disabled={loader}
-              className={`p-2.5 text-[18px] font-medium rounded-[5px] border cursor-pointer no-underline ${loader ? 'bg-gray-600' : 'text-white hover:bg-white hover:text-black'}`}
-            >
-              SignUp
-            </button>
-
-            <Link to="/" className='p-2.5 text-[18px] font-medium rounded-[5px] border cursor-pointer text-white no-underline hover:bg-white hover:text-black'>
-              HomePage
-            </Link>
-          </div>
-
-          {loader && (
-            <Box sx={{ width: '100%', mt: 2 }}>
-              <LinearProgress />
-            </Box>
-          )}
-        </div>
+  <div className="mt-14 text-white w-full flex flex-col items-center min-h-screen bg-black px-4">
+    {/* Form container */}
+    <div className="w-full max-w-md sm:max-w-lg md:max-w-xl border py-6 px-6 mt-8 flex flex-col items-center justify-center shadow-[0.5px_0.5px_8px_white] rounded-md bg-[#111]">
+      {/* Title */}
+      <div className="flex gap-3 w-full justify-center items-center text-2xl sm:text-3xl font-['Oswald','sans-serif'] font-normal">
+        <img
+          className="mr-1.5"
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png"
+          alt="yt"
+          height="30"
+          width="30"
+        />
+        SignUp
       </div>
-      <ToastContainer />
+
+      {/* Form Inputs */}
+      <div className="gap-4 w-full flex justify-center items-center flex-col mt-8">
+        <input
+          type="text"
+          placeholder="User Name"
+          value={signUpField.username}
+          onChange={(e) => handleInpField(e, "username")}
+          className="w-full h-11 text-white px-3 rounded-md bg-[#222222] outline-none"
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={signUpField.email}
+          onChange={(e) => handleInpField(e, "email")}
+          className="w-full h-11 text-white px-3 rounded-md bg-[#222222] outline-none"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={signUpField.password}
+          onChange={(e) => handleInpField(e, "password")}
+          className="w-full h-11 text-white px-3 rounded-md bg-[#222222] outline-none"
+        />
+        <input
+          type="text"
+          placeholder="About Yourself"
+          value={signUpField.about}
+          onChange={(e) => handleInpField(e, "about")}
+          className="w-full h-11 text-white px-3 rounded-md bg-[#222222] outline-none"
+        />
+
+        {/* File Upload & Preview */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 w-full justify-center">
+          <input
+            type="file"
+            onChange={uploadedImage}
+            className="file:bg-white file:text-black file:border file:border-gray-300 file:px-4 file:py-2 file:rounded hover:file:bg-[#ede1e1]"
+          />
+          <div className="w-[80px] h-[80px] overflow-hidden rounded-full border border-gray-400">
+            <img
+              src={uploadedImageUrl}
+              alt="avatar-preview"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        {/* Buttons */}
+        <div className="w-full flex flex-col sm:flex-row items-center gap-4 justify-center mt-6">
+          <button
+            onClick={handleSignUp}
+            disabled={loader}
+            className={`px-6 py-2 text-base font-medium rounded-md border ${
+              loader
+                ? "bg-gray-600 cursor-not-allowed"
+                : "text-white hover:bg-white hover:text-black"
+            }`}
+          >
+            SignUp
+          </button>
+
+          <Link
+            to="/"
+            className="px-6 py-2 text-base font-medium rounded-md border text-white no-underline hover:bg-white hover:text-black"
+          >
+            HomePage
+          </Link>
+        </div>
+
+        {/* Loader */}
+        {loader && (
+          <Box sx={{ width: "100%", mt: 2 }}>
+            <LinearProgress />
+          </Box>
+        )}
+      </div>
     </div>
-  );
+
+    <ToastContainer />
+  </div>
+);
 }
 
 export default RegisterPage;

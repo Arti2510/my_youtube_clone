@@ -10,6 +10,9 @@ import VideoUpload from "./pages/VideoUpload";
 import RegisterPage from "./pages/RegisterPage";
 import CreateChannel from "./pages/CreateChannel";
 import Channel from "./components/Channel";
+import { AuthProvider } from "./context/AuthContext";
+import EditChannel from "./pages/EditChannel";
+import EditVideo from "./pages/EditVideo";
 
 
 function App() {
@@ -30,6 +33,7 @@ function App() {
   }
   return (
     <div className="App">
+      <AuthProvider>
       <Header sidenavbar={sidenavbar} SideNavbar={SideNavbar}/>
       <Routes>
         <Route path="/" element={<HomePage SideNavbar={SideNavbar}/>}></Route>
@@ -39,7 +43,10 @@ function App() {
         <Route path="/signup" element={<RegisterPage />}></Route>
         <Route path="/:id/channel" element={<CreateChannel />} />
         <Route path="/channel/:id" element={<Channel SideNavbar={SideNavbar}/>} />
+        <Route path="/channel/edit/:id" element={<EditChannel />} />
+        <Route path="/video/edit/:id" element={<EditVideo />} />
       </Routes>
+      </AuthProvider>
     </div>
   );
 }

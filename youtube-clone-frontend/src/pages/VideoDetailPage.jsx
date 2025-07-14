@@ -185,156 +185,142 @@ const handleDislike = async () => {
   }, [id, navigate]);
 
   return (
-    <div className="mt-[56px] flex py-[30px] px-0 justify-center bg-black text-white">
-      <div className="w-full max-w-[875px] flex flex-col">
-        {/* Video Player */}
-        <div className="w-full">
-          {videoUrl ? (
-            <video
-              width={"400"}
-              controls
-              autoPlay
-              className="w-full rounded-[10px]"
-            >
-              <source src={videoUrl} type="video/mp4" />
-              <source src={videoUrl} type="video/webm" />
-              Your Browser does not support the video tag.
-            </video>
-          ) : (
-            <div className="text-white text-center">Loading video...</div>
-          )}
-        </div>
+    <div className="mt-[56px] bg-black text-white flex flex-col lg:flex-row py-6 px-4 lg:px-12 gap-6">
+  {/* Left: Video Section */}
+  <div className="flex-1 max-w-full">
+    {/* Video Player */}
+    <div className="w-full aspect-video bg-gray-900 rounded-lg overflow-hidden">
+      {videoUrl ? (
+        <video controls autoPlay className="w-full h-full object-contain">
+          <source src={videoUrl} type="video/mp4" />
+          Your Browser does not support the video tag.
+        </video>
+      ) : (
+        <div className="text-center py-10">Loading video...</div>
+      )}
+    </div>
 
-        {/* Video Details */}
-        <div className="flex flex-col">
-          <div className="text-[20px] font-bold">{data?.title}</div>
-          <div className="flex justify-between mt-[10px]">
-            <div className="flex gap-[15px]">
-              <Link to={`/channel/${data?.channelId?._id}`} className="w-[35px] h-[35px] cursor-pointer">
-                <img
-                  src={data?.uploader?.avatar}
-                  alt=""
-                  className="w-full rounded-full h-full"
-                />
-              </Link>
-              <div className="flex flex-col">
-                <div className="font-medium text-base">{data?.channelId?.[0]?.channelName}</div>
-                <div className="text-sm text-[#AAAAAA]">
-                  {data?.channelId?.[0]?.createdAt.slice(0, 10)}
-                </div>
-              </div>
-              <div className="bg-white text-black py-0 px-[16px] rounded-[18px] flex justify-center items-center h-[36px] font-semibold cursor-pointer text-sm">
-                {data?.channelId?.[0]?.subscribers} Subscribers
-              </div>
-            </div>
-            <div className="flex gap-[10px] bg-[#a5a5a538] justify-center items-center p-[10px] box-border rounded-[18px] cursor-pointer">
-              <div className="flex gap-[10px] bg-[#a5a5a538] justify-center items-center p-[10px] box-border rounded-[18px]">
-  <div className="flex gap-[10px] cursor-pointer" onClick={handleLike}>
-    {liked ? (
-      <ThumbUpOffAltIcon style={{ color: "skyblue" }} />
-    ) : (
-      <ThumbUpOffAltIcon />
-    )}
-    <div className="font-medium">{data?.likes?.length}</div>
-  </div>
-  <div className="w-0 h-[20px] border"></div>
-  <div className="flex gap-[10px] cursor-pointer" onClick={handleDislike}>
-    {disliked ? (
-      <ThumbDownOffAltIcon style={{ color: "red" }} />
-    ) : (
-      <ThumbDownOffAltIcon />
-    )}
-    <div className="font-medium">{data?.dislikes?.length}</div>
-  </div>
-</div>
-            </div>
-          </div>
-          <div className="flex flex-col bg-[#a5a5a538] w-full rounded-[10px] p-[12px] font-medium text-[14px] gap-[10px] mt-[10px] box-border">
-            <div>{data?.createdAt?.slice(0, 10)}</div>
-            <div>{data?.description}</div>
-          </div>
-        </div>
+    {/* Video Info */}
+    <div className="mt-4">
+      <h1 className="text-xl font-bold">{data?.title}</h1>
 
-        {/* Comments Section */}
-        <div className="flex flex-col mt-5">
-          <div className="text-[20px] font-medium">{comments.length} Comments</div>
-          <div className="flex mt-2.5 gap-2.5">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-3 gap-3">
+        {/* Channel Info */}
+        <div className="flex items-center gap-3">
+          <Link to={`/channel/${data?.channelId?._id}`}>
             <img
-              src={profilePic}
-              alt=""
-              className="w-9 h-9 rounded-full"
+              src={data?.uploader?.avatar}
+              className="w-10 h-10 rounded-full object-cover"
+              alt="uploader"
             />
-            <div className="flex flex-col w-full">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Add a Comment"
-                className="w-full bg-black text-white h-9 border-0 text-base border-b border-gray-500 focus:outline-none placeholder:text-[16px]"
-              />
-              <div className="flex justify-end gap-4 mt-2.5">
-                <div
-                  onClick={() => setMessage("")}
-                  className="py-[8px] px-[16px] rounded-[18px] border cursor-pointer hover:bg-white hover:text-black"
-                >
-                  Cancel
-                </div>
-                <div
-                  onClick={handleCommentSubmit}
-                  className={`py-[8px] px-[16px] rounded-[18px] border cursor-pointer hover:bg-white hover:text-black ${
-                    message.trim() ? "" : "opacity-50 cursor-not-allowed"
-                  }`}
-                >
-                  Comment
-                </div>
-              </div>
-            </div>
+          </Link>
+          <div>
+            <p className="font-semibold text-base">{data?.channelId?.[0]?.channelName}</p>
+            <p className="text-sm text-gray-400">{data?.channelId?.[0]?.createdAt?.slice(0, 10)}</p>
           </div>
+          <span className="ml-4 bg-white text-black px-4 py-1 rounded-full text-sm font-semibold whitespace-nowrap">
+            {data?.channelId?.[0]?.subscribers} Subscribers
+          </span>
+        </div>
 
-          {/* Comment List */}
-          <div className="flex flex-col gap-2.5">
-            {comments?.map((item) => (
-              <div key={item._id} className="flex mt-2.5 gap-2.5">
-                <img
-                  src={item?.user?.avatar}
-                  alt=""
-                  className="w-9 h-9 rounded-full"
-                />
-                <div className="flex flex-col">
-                  <div className="flex gap-2.5">
-                    <div className="text-sm font-medium">{item?.user?.username}</div>
-                    <div className="text-sm text-[#AAAAAA]">{item?.createdAt.slice(0, 10)}</div>
-                  </div>
-                  <div className="mt-2.5">{item?.message}</div>
-                </div>
-              </div>
-            ))}
+        {/* Like/Dislike */}
+        <div className="flex gap-4 bg-[#ffffff1a] rounded-full px-4 py-2">
+          <div className="flex items-center gap-1 cursor-pointer" onClick={handleLike}>
+            <ThumbUpOffAltIcon className={liked ? "text-sky-400" : ""} />
+            <span>{data?.likes?.length}</span>
+          </div>
+          <div className="w-px bg-gray-500 h-5" />
+          <div className="flex items-center gap-1 cursor-pointer" onClick={handleDislike}>
+            <ThumbDownOffAltIcon className={disliked ? "text-red-500" : ""} />
+            <span>{data?.dislikes?.length}</span>
           </div>
         </div>
       </div>
 
-      {/* Right Sidebar - Suggested Videos */}
-      <div className="w-full max-w-[406px] py-[10px] px-[15px] gap-[15px] flex flex-col text-white">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="flex gap-[15px] cursor-pointer">
-            <div className="w-[168px] h-[94px]">
-              <img
-                src="https://img.youtube.com/vi/N1GfjzSJmiQ/maxresdefault.jpg"
-                alt=""
-                className="w-inherit"
-              />
-            </div>
-            <div className="flex flex-col gap-[3px]">
-              <div className="text-[15px] font-medium mb-[5px]">
-                T20 world cup final #India.
+      {/* Description Box */}
+      <div className="bg-[#ffffff1a] p-4 rounded-lg mt-4">
+        <p className="text-sm font-medium text-gray-300">{data?.createdAt?.slice(0, 10)}</p>
+        <p className="mt-2 text-gray-200 whitespace-pre-wrap">{data?.description}</p>
+      </div>
+    </div>
+
+    {/* Comments */}
+    <div className="mt-6">
+      <p className="text-xl font-medium">{comments.length} Comments</p>
+
+      {/* Comment Input */}
+      <div className="flex items-start gap-3 mt-4">
+        <img src={profilePic} className="w-9 h-9 rounded-full" alt="profile" />
+        <div className="flex flex-col w-full">
+          <input
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Add a comment..."
+            className="bg-transparent border-b border-gray-600 text-white placeholder:text-sm focus:outline-none"
+          />
+          <div className="flex justify-end gap-3 mt-2">
+            <button
+              onClick={() => setMessage("")}
+              className="text-white border px-4 py-1 rounded-full text-sm hover:bg-white hover:text-black"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleCommentSubmit}
+              disabled={!message.trim()}
+              className={`border px-4 py-1 rounded-full text-sm ${
+                message.trim()
+                  ? "text-white hover:bg-white hover:text-black"
+                  : "text-white opacity-50 cursor-not-allowed"
+              }`}
+            >
+              Comment
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Comment List */}
+      <div className="mt-6 flex flex-col gap-4">
+        {comments.map((item) => (
+          <div key={item._id} className="flex gap-3">
+            <img src={item?.user?.avatar} className="w-9 h-9 rounded-full" alt="user" />
+            <div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="font-semibold">{item?.user?.username}</span>
+                <span className="text-xs text-gray-500">{item?.createdAt?.slice(0, 10)}</span>
               </div>
-              <div className="text-[#ffffff9c] text-[12px]">Cricket 320</div>
-              <div className="text-[#ffffff9c] text-[12px]">136K views · 1 day ago</div>
+              <p className="text-white mt-1">{item?.message}</p>
             </div>
           </div>
         ))}
       </div>
     </div>
+  </div>
+
+  {/* Right Sidebar (Suggested Videos) */}
+  <aside className="w-full lg:w-[400px] flex flex-col gap-4">
+    {[...Array(4)].map((_, i) => (
+      <div key={i} className="flex gap-3 cursor-pointer">
+        <div className="w-2/5 h-24 rounded overflow-hidden">
+          <img
+            src="https://img.youtube.com/vi/N1GfjzSJmiQ/maxresdefault.jpg"
+            alt=""
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="flex flex-col justify-between text-sm">
+          <p className="font-semibold leading-tight line-clamp-2">
+            T20 world cup final #India.
+          </p>
+          <p className="text-gray-400 text-xs">Cricket 320</p>
+          <p className="text-gray-500 text-xs">136K views · 1 day ago</p>
+        </div>
+      </div>
+    ))}
+  </aside>
+</div>
   );
 }
 

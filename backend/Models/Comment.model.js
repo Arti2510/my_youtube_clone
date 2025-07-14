@@ -1,27 +1,37 @@
-// comment model
-
 import mongoose from "mongoose";
 
+// ========================================
+// Comment Schema Definition
+// ========================================
 export const commentSchema = new mongoose.Schema({
-  video: {                         // Reference to the parent video
+
+  // Reference to the video this comment belongs to
+  video: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'video',
+    ref: 'video',              // Refers to the 'video' collection
     required: true
   },
-  user: {                         // The user who posted the comment
+
+  // Reference to the user who made the comment
+  user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    ref: 'user',               // Refers to the 'user' collection
     required: true
   },
-  message: {                           // The comment text
+
+  // The actual comment text
+  message: {
     type: String,
     required: true,
-    trim: true
-  },
+    trim: true                // Removes whitespace from start and end
+  }
+
 }, {
-  timestamps: true  
+  // Automatically manage createdAt and updatedAt timestamps
+  timestamps: true
 });
 
+// Create and export the Comment model
 const comment = mongoose.model('comment', commentSchema);
 
 export default comment;

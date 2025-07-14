@@ -110,86 +110,92 @@ function VideoUpload() {
   };
 
   return (
-    <div className='pt-[56px] w-full flex flex-col items-center h-[92vh] font-["Oswald", "sans-serif"] bg-black text-white'>
-      <div className='w-[45%] rounded-[5px] mt-5 shadow-[0.5px_0.5px_8px_white] p-[25px]'>
-        <div className='flex justify-center items-center text-[28px]'>
-          <img
-            className='mr-1.5'
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png"
-            alt=""
-            height={"35px"}
-            width={"35px"}
+  <div className="pt-[56px] w-full flex flex-col items-center min-h-screen font-['Oswald','sans-serif'] bg-black text-white px-4">
+    <div className="w-full max-w-md sm:max-w-xl mt-6 rounded-md shadow-[0.5px_0.5px_8px_white] p-6 bg-[#111]">
+      {/* Heading */}
+      <div className="flex justify-center items-center text-2xl sm:text-3xl font-medium">
+        <img
+          className="mr-2"
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png"
+          alt="YouTube Icon"
+          width={35}
+          height={35}
+        />
+        Upload Video
+      </div>
+
+      {/* Form */}
+      <div className="flex flex-col gap-6 mt-8 items-center w-full">
+        <input
+          type="text"
+          value={inputField.title}
+          onChange={(e) => handleOnChangeInp(e, "title")}
+          placeholder="Title of Video"
+          className="w-full h-11 px-4 bg-[#222222] border-0 rounded-md text-white"
+        />
+        <input
+          type="text"
+          value={inputField.description}
+          onChange={(e) => handleOnChangeInp(e, "description")}
+          placeholder="Description"
+          className="w-full h-11 px-4 bg-[#222222] border-0 rounded-md text-white"
+        />
+        <input
+          type="text"
+          value={inputField.videoType}
+          onChange={(e) => handleOnChangeInp(e, "videoType")}
+          placeholder="Category"
+          className="w-full h-11 px-4 bg-[#222222] border-0 rounded-md text-white"
+        />
+
+        {/* Thumbnail Upload */}
+        <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
+          <label className="text-white w-full sm:w-[100px]">Thumbnail</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => uploadedImage(e, "image")}
+            className="w-full sm:w-auto file:bg-white file:text-black file:border file:border-gray-300 file:px-4 file:py-2 file:rounded hover:file:bg-[#ede1e1]"
           />
-          Upload Video
         </div>
 
-        <div className='flex flex-col gap-[30px] mt-[30px] items-center'>
+        {/* Video Upload */}
+        <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
+          <label className="text-white w-full sm:w-[100px]">Video</label>
           <input
-            type="text"
-            value={inputField.title}
-            onChange={(e) => handleOnChangeInp(e, "title")}
-            placeholder='Title of Video'
-            className='w-[70%] h-[45px] px-[20px] bg-[#222222] border-0 rounded-[5px] text-white'
+            type="file"
+            accept="video/mp4, video/webm, video/*"
+            onChange={(e) => uploadedImage(e, "video")}
+            className="w-full sm:w-auto file:bg-white file:text-black file:border file:border-gray-300 file:px-4 file:py-2 file:rounded hover:file:bg-[#ede1e1]"
           />
-          <input
-            type="text"
-            value={inputField.description}
-            onChange={(e) => handleOnChangeInp(e, "description")}
-            placeholder='Description'
-            className='w-[70%] h-[45px] px-[20px] bg-[#222222] border-0 rounded-[5px] text-white'
-          />
-          <input
-            type="text"
-            value={inputField.videoType}
-            onChange={(e) => handleOnChangeInp(e, "videoType")}
-            placeholder='Category'
-            className='w-[70%] h-[45px] px-[20px] bg-[#222222] border-0 rounded-[5px] text-white'
-          />
-
-          <div className="flex items-center gap-2">
-            <label className="text-white">Thumbnail</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => uploadedImage(e, "image")}
-              className="file:bg-white file:text-black file:border file:border-gray-300 file:px-4 file:py-2 file:rounded hover:file:bg-[#ede1e1]"
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <label className="text-white">Video</label>
-            <input
-              type="file"
-              accept="video/mp4, video/webm, video/*"
-              onChange={(e) => uploadedImage(e, "video")}
-              className="file:bg-white file:text-black file:border file:border-gray-300 file:px-4 file:py-2 file:rounded hover:file:bg-[#ede1e1]"
-            />
-          </div>
-
-          {loader && (
-            <Box sx={{ display: 'flex' }}>
-              <CircularProgress />
-            </Box>
-          )}
         </div>
 
-        <div className='flex gap-[30px] justify-center mt-[30px]'>
-          <div
-            onClick={handleSubmit}
-            className='py-[10px] px-[20px] border font-medium text-[18px] rounded-[5px] cursor-pointer hover:bg-white hover:text-black'
-          >
-            Upload
-          </div>
-          <Link
-            to='/'
-            className='py-[10px] px-[20px] border font-medium text-[18px] rounded-[5px] cursor-pointer hover:bg-white hover:text-black'
-          >
-            Home
-          </Link>
+        {/* Loader */}
+        {loader && (
+          <Box sx={{ display: "flex" }}>
+            <CircularProgress />
+          </Box>
+        )}
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+        <div
+          onClick={handleSubmit}
+          className="py-2.5 px-6 border font-medium text-base rounded-md cursor-pointer hover:bg-white hover:text-black text-center"
+        >
+          Upload
         </div>
+        <Link
+          to="/"
+          className="py-2.5 px-6 border font-medium text-base rounded-md cursor-pointer hover:bg-white hover:text-black text-center"
+        >
+          Home
+        </Link>
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 export default VideoUpload;

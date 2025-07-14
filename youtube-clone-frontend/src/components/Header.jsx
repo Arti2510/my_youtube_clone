@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
@@ -8,18 +8,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import Login from './Login';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { AuthContext } from "../context/AuthContext";
 
 function Header({ sidenavbar, SideNavbar }) {
   const [userPic, setUserPic] = useState("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ2shxjBolAQ3pYz1AJIAv0vd3-7AdOLSQHA&s");
   const [userName, setUserName] = useState("");
   const [navbarModel, setNavbarModel] = useState(false);
+  const { searchTitle, setSearchTitle } = useContext(AuthContext);
+  const [inputValue, setInputValue] = useState(searchTitle);
   const [login, setLogin] = useState(false);
   const [isLogedIn, setIsLogedIn] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
-  const handleClickModel = () => setNavbarModel((prev) => !prev);
-  const sidenavbarfunc = () => sidenavbar(!SideNavbar);
 
   const handleProfile = () => {
     let userId = localStorage.getItem("UserId");
@@ -58,86 +57,120 @@ function Header({ sidenavbar, SideNavbar }) {
     if (userName) setUserName(userName);
   }, []);
 
-  // ✅ Trigger search event to be listened by MainPage
-  const handleSearch = () => {
-    window.dispatchEvent(new CustomEvent("searchVideo", { detail: searchTerm }));
+  useEffect(() => {
+    setInputValue(searchTitle);
+  }, [searchTitle]);
+
+  const handleClickModel = () => setNavbarModel((prev) => !prev);
+  const sidenavbarfunc = () => sidenavbar(!SideNavbar);
+
+  const triggerSearch = () => {
+    setSearchTitle(inputValue);
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("searchVideo", { detail: inputValue }));
+    }, 0);
   };
 
   return (
-    <div className='h-14 box-border py-[10px] px-[16px] flex items-center w-full justify-between top-0 fixed bg-black z-10'>
-      <div className="gap-[10px] flex justify-center items-center w-fit">
-        <div className="w-10 h-10 flex justify-center items-center cursor-pointer" onClick={sidenavbarfunc}>
-          <MenuIcon sx={{ color: "white" }} />
-        </div>
-        <Link to='/' className='flex justify-center items-center cursor-pointer text-white no-underline'>
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png" alt="logo" height="35px" width="35px" />
-          <div className='text-[20px] font-sans font-normal not-italic ml-0.5'>YouTube</div>
-        </Link>
-      </div>
-
-      {/* ✅ Search Bar */}
-      <div className='flex gap-[10px] w-1/2'>
-        <div className='flex w-4/5'>
-          <input
-            type="text"
-            placeholder='Search'
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSearch();
-            }}
-            className='w-full h-[40%] rounded-tl-[20px] rounded-bl-[20px] border border-[rgb(58,57,57)] p-4 bg-[#121212] text-white text-base pl-[30px] focus:outline-none placeholder:text-[16px]'
-          />
-          <div
-            onClick={handleSearch}
-            className='cursor-pointer w-[70px] border border-[rgb(42,42,42)] bg-[rgb(42,42,42)] flex justify-center items-center rounded-tr-[20px] rounded-br-[20px] h-[65%]'
-          >
-            <SearchIcon sx={{ color: "white", fontSize: "28px" }} />
-          </div>
-          <div className='flex justify-center items-center bg-[rgb(42,42,42)] rounded-full w-[40px] h-[40px]'>
-            <KeyboardVoiceIcon sx={{ color: "white" }} />
-          </div>
-        </div>
-      </div>
-
-      {/* Right Side Icons and User */}
-      <div className='flex gap-[10px] justify-center items-center relative'>
-        <button
-          onClick={() => {
-            const userId = localStorage.getItem("UserId");
-            if (userId) {
-              navigate(`/${userId}/channel`);
-            } else {
-              toast.error("Please login to create a channel");
-            }
-          }}
-          className='text-white border border-white px-3 py-1 rounded hover:bg-white hover:text-black text-sm font-medium rounded-[20px] cursor-pointer'
-        >
-          + Create Channel
-        </button>
-
-        {localStorage.getItem("UserId") && (
-          <Link to={`/${localStorage.getItem("UserId")}/upload`}>
-            <VideoCallIcon sx={{ color: "white", cursor: "pointer", fontSize: "30px" }} />
-          </Link>
-        )}
-
-        <NotificationsNoneIcon sx={{ color: "white", cursor: "pointer", fontSize: "30px" }} />
-        <img src={userPic} alt="user_logo" className='w-[30px] rounded-full cursor-pointer' onClick={handleClickModel} />
-        <div className='bg-black text-white'>{userName}</div>
-
-        {navbarModel && (
-          <div className='absolute top-[35px] w-full z-[20] text-white'>
-            {isLogedIn && <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]' onClick={handleProfile}>Profile</div>}
-            {!isLogedIn && <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]' onClick={() => onClickOption("login")}>LogIn</div>}
-            {isLogedIn && <div className='bg-[rgb(85,85,85)] p-[10px] cursor-pointer hover:bg-[rgb(34,33,33)]' onClick={() => onClickOption("logout")}>Logout</div>}
-          </div>
-        )}
-      </div>
-
-      {login && <Login setLOginModel={setLOginModel} />}
+    <div className="fixed top-0 left-0 w-full bg-black z-50 border-b border-gray-800">
+  <div className="flex items-center justify-between flex-wrap px-4 py-2 gap-3">
+    
+    {/* Left: Logo + Menu */}
+    <div className="flex items-center gap-2">
+      <button className="text-white" onClick={sidenavbarfunc}>
+        <MenuIcon />
+      </button>
+      <Link to="/" className="flex items-center gap-1 text-white text-xl font-semibold">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png"
+          alt="logo"
+          className="w-7 h-7"
+        />
+        <span>YouTube</span>
+      </Link>
     </div>
-  );
+
+    {/* Center: Search bar (always visible now) */}
+    <div className="flex flex-1 justify-center max-w-[500px] min-w-[180px]">
+      <div className="flex w-full">
+        <input
+          type="text"
+          placeholder="Search"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && triggerSearch()}
+          className="w-full px-4 py-1.5 text-sm rounded-l-full bg-[#121212] border border-gray-700 text-white placeholder:text-sm focus:outline-none"
+        />
+        <button
+          onClick={triggerSearch}
+          className="px-4 py-1.5 bg-[#2a2a2a] rounded-r-full border border-l-0 border-gray-700 flex items-center justify-center"
+        >
+          <SearchIcon sx={{ color: "white", fontSize: 24 }} />
+        </button>
+      </div>
+    </div>
+
+    {/* Right: Buttons */}
+    <div className="flex items-center gap-3 text-white">
+      <button
+        onClick={() => {
+          const userId = localStorage.getItem("UserId");
+          if (userId) {
+            navigate(`/${userId}/channel`);
+          } else {
+            toast.error("Please login to create a channel");
+          }
+        }}
+        className="text-white border border-white px-3 py-1 rounded-full text-sm hover:bg-white hover:text-black whitespace-nowrap"
+      >
+        + Create Channel
+      </button>
+
+      {localStorage.getItem("UserId") && (
+        <Link to={`/${localStorage.getItem("UserId")}/upload`}>
+          <VideoCallIcon sx={{ color: "white", fontSize: 26 }} />
+        </Link>
+      )}
+
+      <NotificationsNoneIcon sx={{ color: "white", fontSize: 26 }} />
+      <img
+        src={userPic}
+        alt="user"
+        className="w-8 h-8 rounded-full cursor-pointer"
+        onClick={handleClickModel}
+      />
+
+      {/* Show username on md+ only */}
+      <span className="hidden md:inline-block text-white">{userName}</span>
+    </div>
+  </div>
+
+  {/* Dropdown */}
+  {navbarModel && (
+    <div className="absolute right-4 top-[56px] w-40 bg-[#333] text-white rounded-md shadow-md z-50">
+      {isLogedIn && (
+        <div className="p-2 hover:bg-gray-700 cursor-pointer" onClick={handleProfile}>
+          Profile
+        </div>
+      )}
+      {!isLogedIn && (
+        <div className="p-2 hover:bg-gray-700 cursor-pointer" onClick={() => onClickOption("login")}>
+          Login
+        </div>
+      )}
+      {isLogedIn && (
+        <div className="p-2 hover:bg-gray-700 cursor-pointer" onClick={() => onClickOption("logout")}>
+          Logout
+        </div>
+      )}
+    </div>
+  )}
+
+  {/* Login Modal */}
+  {login && <Login setLOginModel={setLOginModel} />}
+</div>
+  )
 }
+
 
 export default Header;

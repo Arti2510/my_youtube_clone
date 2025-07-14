@@ -1,20 +1,21 @@
-
 import Video from "../Models/Video.model.js";
 import channel from "../Models/Channel.model.js";
 
-// Create a new video
+// ================================
+// Upload a new video
+// ================================
 export const uploadVideo = async (req, res) => {
   try {
-    console.log("📥 Video upload request body:", req.body);
-    console.log("🔐 Authenticated user:", req.user);
 
     const { title, videoUrl, thumbnailUrl, description, channelId, videoType } = req.body;
     const uploader = req.user?._id;
 
+    // Validate required fields
     if (!title || !videoUrl || !thumbnailUrl || !description) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
+    // Create a new video document
     const newVideo = new Video({
       title,
       videoUrl,
@@ -22,42 +23,43 @@ export const uploadVideo = async (req, res) => {
       description,
       uploader,
       videoType: videoType || "All",
-      channelId: channelId,
+      channelId,
       views: 0,
       likes: [],
       dislikes: [],
       comments: [],
     });
 
-    console.log("📺 channelId received:", channelId);
-
     await newVideo.save();
+
+    // Add video to channel’s video array
     await channel.findByIdAndUpdate(
-  channelId,
-  { $push: { video: newVideo._id } }, // ✅ correct field name and variable
-  { new: true }
-);
-    res.status(201).json({ message: "✅ Video uploaded", video: newVideo });
+      channelId,
+      { $push: { video: newVideo._id } },
+      { new: true }
+    );
+
+    res.status(201).json({ message: "Video uploaded", video: newVideo });
   } catch (err) {
-    console.error("❌ Upload error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-
+// ================================
+// Get all videos (with filter)
+// ================================
 export const getAllVideos = async (req, res) => {
   try {
     const { type, title } = req.query;
 
-    // Build dynamic filter
+    // Build dynamic filter object
     const filter = {};
     if (type && type !== "All") {
-  filter.videoType = { $regex: `^${type}$`, $options: "i" }; // exact match, case-insensitive
-}
-    if (title && title.trim() !== "") {
-      filter.title = { $regex: title, $options: "i" }; // Case-insensitive partial match
+      filter.videoType = { $regex: `^${type}$`, $options: "i" };
     }
-    console.log("🎯 Final filter used:", filter);
+    if (title && title.trim() !== "") {
+      filter.title = { $regex: title, $options: "i" };
+    }
 
     const videos = await Video.find(filter)
       .populate({
@@ -83,18 +85,16 @@ export const getAllVideos = async (req, res) => {
 
     res.status(200).json(videos);
   } catch (err) {
-    console.error("Backend error in getAllVideos:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
 
-
-
-
-// // Get video by ID
+// ================================
+// Get a video by ID
+// ================================
 export const getVideoById = async (req, res) => {
   try {
-    console.log("Video ID:", req.params.id);
+
     const video = await Video.findById(req.params.id)
       .populate({
         path: 'uploader',
@@ -128,39 +128,31 @@ export const getVideoById = async (req, res) => {
   }
 };
 
-
+// ================================
+// Update video (only owner)
+// ================================
 export const updateVideo = async (req, res) => {
   try {
     const video = await Video.findById(req.params.id);
     if (!video) return res.status(404).json({ message: "Video not found" });
 
+    // Ensure only uploader can update
     if (video.uploader.toString() !== req.user.id) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
-    const updateFields = { ...req.body };
-    const updateQuery = {
-      $set: { ...updateFields },
-      $push: {}
-    };
+    // Only update allowed fields
+    const allowedFields = ["title", "description", "thumbnailUrl", "videoUrl", "videoType"];
+    const updates = {};
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
+    });
 
-    // Push to array fields if provided
-    if (req.body.channelId) {
-      updateQuery.$push.channelId = { $each: req.body.channelId };
-      delete updateQuery.$set.channelId;
-    }
-
-    if (req.body.comments) {
-      updateQuery.$push.comments = { $each: req.body.comments };
-      delete updateQuery.$set.comments;
-    }
-
-    // Remove empty $push
-    if (Object.keys(updateQuery.$push).length === 0) {
-      delete updateQuery.$push;
-    }
-
-    const updatedVideo = await Video.findByIdAndUpdate(req.params.id, updateQuery, { new: true });
+    const updatedVideo = await Video.findByIdAndUpdate(req.params.id, updates, {
+      new: true,
+    });
 
     res.status(200).json(updatedVideo);
   } catch (err) {
@@ -168,14 +160,18 @@ export const updateVideo = async (req, res) => {
   }
 };
 
-
-// // Delete a video
+// ================================
+// Delete video (only owner)
+// ================================
 export const deleteVideo = async (req, res) => {
   try {
     const video = await Video.findById(req.params.id);
     if (!video) return res.status(404).json({ message: "Video not found" });
-    if (video.uploader.toString() !== req.user.id)
+
+    // Ensure only uploader can delete
+    if (video.uploader.toString() !== req.user.id) {
       return res.status(403).json({ message: "Unauthorized" });
+    }
 
     await video.deleteOne();
     res.status(200).json({ message: "Video deleted successfully" });
@@ -184,27 +180,25 @@ export const deleteVideo = async (req, res) => {
   }
 };
 
-// Like video
-// Like video
+// ================================
+// Like a video (toggle)
+// ================================
 export const likeVideo = async (req, res) => {
   try {
     const videoId = req.params.id;
     const userId = req.user._id?.toString();
 
-    console.log("🔐 User ID:", userId);
-    console.log("🎬 Video ID:", videoId);
-
     const video = await Video.findById(videoId);
     if (!video) return res.status(404).json({ message: "Video not found" });
 
-    // ✅ Fallback for old videos
+    // Fallback in case arrays are undefined
     video.likes = video.likes || [];
     video.dislikes = video.dislikes || [];
 
     const likes = video.likes.map(id => id.toString());
     const dislikes = video.dislikes.map(id => id.toString());
 
-    // Remove from dislikes
+    // Remove from dislikes if present
     if (dislikes.includes(userId)) {
       video.dislikes = video.dislikes.filter(id => id.toString() !== userId);
     }
@@ -212,41 +206,35 @@ export const likeVideo = async (req, res) => {
     // Toggle like
     if (likes.includes(userId)) {
       video.likes = video.likes.filter(id => id.toString() !== userId);
-      console.log("👍 Like removed");
     } else {
       video.likes.push(req.user._id);
-      console.log("👍 Like added");
     }
 
     const updated = await video.save();
     res.status(200).json(updated);
   } catch (err) {
-    console.error("🔥 LIKE VIDEO ERROR:", err.message);
     res.status(500).json({ error: err.message });
   }
 };
 
-
-// Dislike video
+// ================================
+// Dislike a video (toggle)
+// ================================
 export const dislikeVideo = async (req, res) => {
   try {
     const videoId = req.params.id;
     const userId = req.user._id?.toString();
 
-    console.log("🔐 User ID:", userId);
-    console.log("🎬 Video ID:", videoId);
-
     const video = await Video.findById(videoId);
     if (!video) return res.status(404).json({ message: "Video not found" });
 
-    // Ensure arrays exist
     video.likes = video.likes || [];
     video.dislikes = video.dislikes || [];
 
     const likes = video.likes.map(id => id.toString());
     const dislikes = video.dislikes.map(id => id.toString());
 
-    // Remove from likes
+    // Remove from likes if present
     if (likes.includes(userId)) {
       video.likes = video.likes.filter(id => id.toString() !== userId);
     }
@@ -254,22 +242,20 @@ export const dislikeVideo = async (req, res) => {
     // Toggle dislike
     if (dislikes.includes(userId)) {
       video.dislikes = video.dislikes.filter(id => id.toString() !== userId);
-      console.log("👎 Dislike removed");
     } else {
       video.dislikes.push(req.user._id);
-      console.log("👎 Dislike added");
     }
 
     const updated = await video.save();
     res.status(200).json(updated);
   } catch (err) {
-    console.error("🔥 DISLIKE VIDEO ERROR:", err.message);
     res.status(500).json({ error: err.message });
   }
 };
 
-
-
+// ================================
+// Get all videos uploaded by a user
+// ================================
 export const getAllVideosByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -297,4 +283,3 @@ export const getAllVideosByUserId = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
