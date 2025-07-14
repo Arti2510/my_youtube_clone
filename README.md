@@ -201,4 +201,4 @@ Node.js
 ### 🏠 Homepage
 Displays a grid of videos with thumbnails, titles, and uploader info.
 
-![Homepage Screenshot](./Screenshot youtube-clone.png)
+![Homepage Screenshot](youtube-clone-image.png)
