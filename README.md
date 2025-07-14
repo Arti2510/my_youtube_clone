@@ -5,7 +5,8 @@ A full-stack YouTube Clone application built using the MERN (MongoDB, Express.js
 
 ## 📁 Project Structure
 my_youtube_clone/
-├── youtube-clone-frontend/ # Frontend (React + Vite + Tailwind CSS)
+├── youtube-clone-frontend/ # Front
+end (React + Vite + Tailwind CSS)
 ├── bakcend/ # Backend (Node.js + Express + MongoDB)
 ├── README.md
 └── ...
@@ -201,4 +202,4 @@ Node.js
 ### 🏠 Homepage
 Displays a grid of videos with thumbnails, titles, and uploader info.
 
-![Homepage Screenshot](./screenshots/youtube-clone-image.png)
+![Homepage Screenshot]<img width="1907" height="972" alt="youtube-clone-image" src="https://github.com/user-attachments/assets/dcf0150a-0ca1-483c-b40b-8548c647a941" />
